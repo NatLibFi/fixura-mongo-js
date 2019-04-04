@@ -1,0 +1,6 @@
+{
+    "fs.files": [{
+      "length": 6,"filename": "foobar"
+    }],
+    "fs.chunks": [{}]
+  }
