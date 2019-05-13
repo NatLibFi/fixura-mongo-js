@@ -6,20 +6,21 @@ Test fixtures with MongoDB is as easy as ABC with Fixura.
 ## ES modules
 ```js
 import mongoFixturesFactory from '@natlibfi/fixura-mongo';
-const mongoFixtures = fixturesFactory({rootPath: [__dirname, '...', 'test-fixtures']});
+const mongoFixtures = await fixturesFactory({rootPath: [__dirname, '...', 'test-fixtures']});
 await mongoFixtures.populate(['dbContents.json']);
 await mongoFixtures.dump();
 ```
 ## Node.js require
 ```js
 import {default: mongoFixturesFactory} from '@natlibfi/fixura-mongo';
-const mongoFixtures = fixturesFactory({rootPath: [__dirname, '...', 'test-fixtures']});
+const mongoFixtures = await fixturesFactory({rootPath: [__dirname, '...', 'test-fixtures']});
 await mongoFixtures.populate(['dbContents.json']);
 await mongoFixtures.dump();
 ```
 # Configuration
 ## Factory parameters
 - **rootPath**: An array of directory names to construct the path to the test fixtures directory
+- **useObjectId**: A boolean indicating whether **_id** property in documents should be cast as Mongo ObjectId. Defaults to false.
 - **gridFS**: An optional parameter which enables using gridFS functions. Can be boolean or an object:
   - **bucketName**: The name of the gridFS bucket to create (Optional)
 ### Mongo instance
@@ -56,8 +57,8 @@ Where object properties are filenames and their values their content. This alter
 {
     "foo": ["bar", "content.txt"]
 }
-The path is then resolved using the root directory defined in the factory function (`rootPath`).
 ```
+The path is then resolved using the root directory defined in the factory function (`rootPath`).
 ### dumpFiles (GridFS)
 Dumps the files from the database. The format is an object with filenames as properties and their values are Readable streams. Passing `true` as the sole function arguments returns file contents as property values. Like so:
 ```js
