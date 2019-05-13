@@ -84,8 +84,26 @@ describe('index', () => {
 			expect(collections).to.have.lengthOf(1);
 			expect(collections[0].collectionName).to.equal('fubar');
 
+			const docs = await getDocuments(collections[0], {includeId: true});
+
+			expect(docs).to.eql(db.fubar);
+		});
+
+		it('Should populate the db convert "_id"-properties to ObjectId objects', async (index = '2') => {
+			const db = getFixture(['populate', index, 'db.json']);
+			mongoFixtures = await factory({rootPath: FIXTURES_PATH, useObjectId: true});
+
+			await connectClient();
+			await mongoFixtures.populate(['populate', index, 'db.json']);
+
+			const collections = await client.db().collections();
+
+			expect(collections).to.have.lengthOf(1);
+			expect(collections[0].collectionName).to.equal('fubar');
+
 			const docs = await getDocuments(collections[0]);
 
+			delete db.fubar[0].foo._id;
 			expect(docs).to.eql(db.fubar);
 		});
 	});
@@ -248,11 +266,17 @@ describe('index', () => {
 				const docs = [];
 
 				collection.find({})
-					.on('data', doc => docs.push(formatDoc(doc)))
+					.on('data', doc => {
+						if (typeof doc === 'object') {
+							docs.push(formatObj(doc));
+						} else {
+							return docs.push(doc);
+						}
+					})
 					.on('end', () => resolve(docs))
 					.on('error', reject);
 
-				function formatDoc(doc) {
+				function formatObj(o) {
 					const FILTER_KEYS = [
 						'_id',
 						'chunkSize',
@@ -263,11 +287,17 @@ describe('index', () => {
 						'data'
 					];
 
-					return Object.keys(doc)
-						.filter(k => !FILTER_KEYS.includes(k))
-						.reduce((acc, k) => {
-							return {...acc, [k]: doc[k]};
-						}, {});
+					return Object.keys(o).reduce((acc, key) => {
+						if (FILTER_KEYS.includes(key)) {
+							return acc;
+						}
+
+						if (typeof o[key] === 'object') {
+							return {...acc, [key]: formatObj(o[key])};
+						}
+
+						return {...acc, [key]: o[key]};
+					}, {});
 				}
 			});
 		}

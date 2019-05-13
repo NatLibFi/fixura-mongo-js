@@ -27,11 +27,11 @@
 */
 
 import MongoMemoryServer from 'mongodb-memory-server';
-import {MongoClient} from 'mongodb';
+import {MongoClient, ObjectId} from 'mongodb';
 import fixturesFactory, {READERS} from '@natlibfi/fixura';
 import gridFSFactory from './gridfs';
 
-export default async function ({rootPath, gridFS = false} = {}) {
+export default async function ({rootPath, gridFS = false, useObjectId = false} = {}) {
 	const {getFixture} = fixturesFactory({root: rootPath, reader: READERS.JSON});
 	const {getConnectionString, closeCallback} = getMongoMethods();
 
@@ -67,7 +67,26 @@ export default async function ({rootPath, gridFS = false} = {}) {
 
 		await Promise.all(Object.keys(data).map(async name => {
 			const collection = await client.db().createCollection(name);
-			await collection.insert(data[name]);
+
+			if (useObjectId) {
+				return collection.insert(data[name].map(format));
+			}
+
+			return collection.insert(data[name]);
+
+			function format(o) {
+				return Object.keys(o).reduce((acc, key) => {
+					if (typeof o[key] === 'object') {
+						return {...acc, [key]: format(o[key])};
+					}
+
+					if (key === '_id') {
+						return {...acc, [key]: new ObjectId(o[key])};
+					}
+
+					return {...acc, [key]: o[key]};
+				}, {});
+			}
 		}));
 
 		return client.close();
@@ -109,6 +128,7 @@ export default async function ({rootPath, gridFS = false} = {}) {
 	}
 
 	function getMongoMethods() {
+		/* istanbul ignore next: This won't be tested */
 		if ('MONGO_URI' in process.env) {
 			return {
 				getConnectionString: async () => process.env.MONGO_URI,
