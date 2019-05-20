@@ -69,17 +69,13 @@ export default async function ({rootPath, gridFS = false, useObjectId = false} =
 			const collection = await client.db().createCollection(name);
 
 			if (useObjectId) {
-				return collection.insert(data[name].map(format));
+				return collection.insertMany(data[name].map(format));
 			}
 
-			return collection.insert(data[name]);
+			return collection.insertMany(data[name]);
 
 			function format(o) {
 				return Object.keys(o).reduce((acc, key) => {
-					if (typeof o[key] === 'object') {
-						return {...acc, [key]: format(o[key])};
-					}
-
 					if (key === '_id') {
 						return {...acc, [key]: new ObjectId(o[key])};
 					}
