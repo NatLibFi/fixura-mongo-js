@@ -46,7 +46,7 @@ describe('index', () => {
 		await mongoFixtures.close();
 	});
 
-	describe('getConnectionString', () => {
+	describe('#getConnectionString', () => {
 		it('Should return a valid connection string', async () => {
 			mongoFixtures = await factory();
 			await connectClient();
@@ -54,7 +54,7 @@ describe('index', () => {
 		});
 	});
 
-	describe('populate', () => {
+	describe('#populate', () => {
 		it('Should populate the db', async (index = '0') => {
 			const db = getFixture(['populate', index, 'db.json']);
 			mongoFixtures = await factory();
@@ -102,13 +102,11 @@ describe('index', () => {
 			expect(collections[0].collectionName).to.equal('fubar');
 
 			const docs = await getDocuments(collections[0]);
-
-			delete db.fubar[0].foo._id;
 			expect(docs).to.eql(db.fubar);
 		});
 	});
 
-	describe('dump', () => {
+	describe('#dump', () => {
 		it('Should dump the database', async (index = '0') => {
 			const db = getFixture(['dump', index, 'db.json']);
 			mongoFixtures = await factory();
@@ -122,7 +120,7 @@ describe('index', () => {
 		});
 	});
 
-	describe('clear', () => {
+	describe('#clear', () => {
 		it('Should clear the database', async (index = '0') => {
 			const db = getFixture(['clear', index, 'db.json']);
 			mongoFixtures = await factory();
@@ -136,7 +134,7 @@ describe('index', () => {
 		});
 	});
 
-	describe('populateFiles', () => {
+	describe('#populateFiles', () => {
 		it('Should populate the database with files', async (index = '0') => {
 			const expectedDb = getFixture(['populateFiles', index, 'expectedDb.json']);
 			const data = getFixture({components: ['populateFiles', index, 'data.txt'], reader: READERS.TEXT});
@@ -176,7 +174,7 @@ describe('index', () => {
 		});
 	});
 
-	describe('dumpFiles', () => {
+	describe('#dumpFiles', () => {
 		it('Should dump files from the database', async (index = '0') => {
 			const data = getFixture({components: ['dumpFiles', index, 'data.txt'], reader: READERS.TEXT});
 			const inputFiles = {
@@ -211,7 +209,7 @@ describe('index', () => {
 		});
 	});
 
-	describe('clearFiles', () => {
+	describe('#clearFiles', () => {
 		it('Should clear the files', async (index = '0') => {
 			const data = getFixture({components: ['clearFiles', index, 'data.txt'], reader: READERS.TEXT});
 			const files = {
@@ -267,11 +265,7 @@ describe('index', () => {
 
 				collection.find({})
 					.on('data', doc => {
-						if (typeof doc === 'object') {
-							docs.push(formatObj(doc));
-						} else {
-							return docs.push(doc);
-						}
+						docs.push(formatObj(doc));
 					})
 					.on('end', () => resolve(docs))
 					.on('error', reject);
@@ -290,10 +284,6 @@ describe('index', () => {
 					return Object.keys(o).reduce((acc, key) => {
 						if (FILTER_KEYS.includes(key)) {
 							return acc;
-						}
-
-						if (typeof o[key] === 'object') {
-							return {...acc, [key]: formatObj(o[key])};
 						}
 
 						return {...acc, [key]: o[key]};

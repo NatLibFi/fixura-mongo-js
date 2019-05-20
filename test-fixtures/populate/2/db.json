@@ -2,7 +2,7 @@
     "fubar": [{
         "foo": {
             "_id": "5cd9539d7b90244b900852ab",
-            "bar": "fubar"
+            "bar": ["fu", "bar"]
         }
     }]
 }
