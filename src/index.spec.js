@@ -89,9 +89,31 @@ describe('index', () => {
 			expect(docs).to.eql(db.fubar);
 		});
 
-		it('Should populate the db convert "_id"-properties to ObjectId objects', async (index = '2') => {
+		it('Should populate the db and convert "_id"-properties to ObjectId objects', async (index = '2') => {
 			const db = getFixture(['populate', index, 'db.json']);
 			mongoFixtures = await factory({rootPath: FIXTURES_PATH, useObjectId: true});
+
+			await connectClient();
+			await mongoFixtures.populate(['populate', index, 'db.json']);
+
+			const collections = await client.db().collections();
+
+			expect(collections).to.have.lengthOf(1);
+			expect(collections[0].collectionName).to.equal('fubar');
+
+			const docs = await getDocuments(collections[0]);
+			expect(docs).to.eql(db.fubar);
+		});
+
+		it('Should populate the db and format values', async (index = '3') => {
+			const db = getFixture(['populate', index, 'db.json']);
+
+			mongoFixtures = await factory({rootPath: FIXTURES_PATH, format: {
+				fubar: {foo: () => 'foo'}
+			}});
+
+			// Expectation
+			db.fubar[0].foo = 'foo';
 
 			await connectClient();
 			await mongoFixtures.populate(['populate', index, 'db.json']);

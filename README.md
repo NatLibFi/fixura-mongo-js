@@ -21,10 +21,12 @@ await mongoFixtures.dump();
 ## Factory parameters
 - **rootPath**: An array of directory names to construct the path to the test fixtures directory
 - **useObjectId**: A boolean indicating whether **_id** property in documents should be cast as Mongo ObjectId. Defaults to false.
+- **format**: An object of collection name - document property mapping with formatting functions as values (See examples below)
 - **gridFS**: An optional parameter which enables using gridFS functions. Can be boolean or an object:
   - **bucketName**: The name of the gridFS bucket to create (Optional)
 ### Mongo instance
 By default, fixura-mongo uses [mongodb-memory-server](https://www.npmjs.com/package/mongodb-memory-server). For using an externally started Mongo, set environment variable `MONGO_URI`.
+# Usage
 ## Functions
 All functions are asynchronous.
 ### populate
@@ -67,6 +69,24 @@ typeof data === 'string'
 // true
 ```
 ### clearFiles (GridFS)
+## Examples
+Using the `format` parameter:
+```js
+import mongoFixturesFactory from '@natlibfi/fixura-mongo';
+
+const mongoFixtures = await fixturesFactory({
+    rootPath: [__dirname, '...', 'test-fixtures'],
+    format: {
+        foo: {
+            bar: v => new Date(v)
+        }
+    }
+});
+
+// Populates the database and formats the 'bar'-properties in documents of the foo'-collection as Dates
+await mongoFixtures.populate(['dbContents.json']);
+
+```
 Removes all files from the database
 ## License and copyright
 
