@@ -31,7 +31,7 @@ import {MongoClient, ObjectId} from 'mongodb';
 import fixturesFactory, {READERS} from '@natlibfi/fixura';
 import gridFSFactory from './gridfs';
 
-export default async function ({rootPath, gridFS = false, useObjectId = false} = {}) {
+export default async function ({rootPath, gridFS = false, useObjectId = false, format} = {}) {
 	const {getFixture} = fixturesFactory({root: rootPath, reader: READERS.JSON});
 	const {getConnectionString, closeCallback} = getMongoMethods();
 
@@ -68,13 +68,32 @@ export default async function ({rootPath, gridFS = false, useObjectId = false} =
 		await Promise.all(Object.keys(data).map(async name => {
 			const collection = await client.db().createCollection(name);
 
+			if (format && name in format) {
+				data[name] = data[name].map(formatValues);
+			}
+
 			if (useObjectId) {
-				return collection.insertMany(data[name].map(format));
+				return collection.insertMany(data[name].map(formatObjectId));
 			}
 
 			return collection.insertMany(data[name]);
 
-			function format(o) {
+			function formatValues(o) {
+				return Object.keys(o).reduce((acc, key) => {
+					if (key in format[name]) {
+						const cb = format[name][key];
+
+						return {
+							...acc,
+							[key]: cb(o[key])
+						};
+					}
+
+					return {...acc, [key]: o[key]};
+				}, {});
+			}
+
+			function formatObjectId(o) {
 				return Object.keys(o).reduce((acc, key) => {
 					if (key === '_id') {
 						return {...acc, [key]: new ObjectId(o[key])};
