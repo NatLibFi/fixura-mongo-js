@@ -32,136 +32,132 @@ import fixturesFactory, {READERS} from '@natlibfi/fixura';
 import gridFSFactory from './gridfs';
 
 export default async function ({rootPath, gridFS = false, useObjectId = false, format} = {}) {
-	const {getFixture} = fixturesFactory({root: rootPath, reader: READERS.JSON});
-	const {getConnectionString, closeCallback} = getMongoMethods();
+  const {getFixture} = fixturesFactory({root: rootPath, reader: READERS.JSON});
+  const {getUri, closeCallback} = getMongoMethods();
 
-	if (gridFS) {
-		const {populateFiles, dumpFiles, clearFiles} = gridFSFactory({client: await getClient(), rootPath, ...gridFS});
-		const close = async () => {
-			await clearFiles();
-			await clear();
-			await closeCallback();
-		};
+  if (gridFS) {
+    const {populateFiles, dumpFiles, clearFiles} = gridFSFactory({client: await getClient(), rootPath, ...gridFS});
+    const close = async () => {
+      await clearFiles();
+      await clear();
+      await closeCallback();
+    };
 
-		return {populate, dump, clear, close, getConnectionString, populateFiles, dumpFiles, clearFiles};
-	}
+    return {populate, dump, clear, close, getUri, populateFiles, dumpFiles, clearFiles};
+  }
 
-	const close = async () => {
-		await clear();
-		await closeCallback();
-	};
+  const close = async () => {
+    await clear();
+    await closeCallback();
+  };
 
-	return {populate, dump, clear, close, getConnectionString};
+  return {populate, dump, clear, close, getUri};
 
-	async function clear() {
-		const client = await getClient();
-		await client.db().dropDatabase();
-		return client.close();
-	}
+  async function clear() {
+    const client = await getClient();
+    await client.db().dropDatabase();
+    return client.close();
+  }
 
-	async function populate(input) {
-		const data = Array.isArray(input) ? clone(getFixture(input)) : clone(input);
-		const client = await getClient();
+  async function populate(input) {
+    const data = Array.isArray(input) ? clone(getFixture({components: input})) : clone(input);
+    const client = await getClient();
 
-		await clear();
+    await clear();
 
-		await Promise.all(Object.keys(data).map(async name => {
-			const collection = await client.db().createCollection(name);
+    await Promise.all(Object.keys(data).map(async name => {
+      const collection = await client.db().createCollection(name);
 
-			if (format && name in format) {
-				data[name] = data[name].map(formatValues);
-			}
+      if (format && name in format) { // eslint-disable-line functional/no-conditional-statement
+        data[name] = data[name].map(formatValues); // eslint-disable-line functional/immutable-data
+      }
 
-			if (useObjectId) {
-				return collection.insertMany(data[name].map(formatObjectId));
-			}
+      if (useObjectId) {
+        return collection.insertMany(data[name].map(formatObjectId));
+      }
 
-			return collection.insertMany(data[name]);
+      return collection.insertMany(data[name]);
 
-			function formatValues(o) {
-				return Object.keys(o).reduce((acc, key) => {
-					if (key in format[name]) {
-						const cb = format[name][key];
+      function formatValues(o) {
+        return Object.keys(o).reduce((acc, key) => {
+          if (key in format[name]) {
+            const cb = format[name][key];
 
-						return {
-							...acc,
-							[key]: cb(o[key])
-						};
-					}
+            return {
+              ...acc,
+              [key]: cb(o[key])
+            };
+          }
 
-					return {...acc, [key]: o[key]};
-				}, {});
-			}
+          return {...acc, [key]: o[key]};
+        }, {});
+      }
 
-			function formatObjectId(o) {
-				return Object.keys(o).reduce((acc, key) => {
-					if (key === '_id') {
-						return {...acc, [key]: new ObjectId(o[key])};
-					}
+      function formatObjectId(o) {
+        return Object.keys(o).reduce((acc, key) => {
+          if (key === '_id') {
+            return {...acc, [key]: new ObjectId(o[key])};
+          }
 
-					return {...acc, [key]: o[key]};
-				}, {});
-			}
-		}));
+          return {...acc, [key]: o[key]};
+        }, {});
+      }
+    }));
 
-		return client.close();
-	}
+    return client.close();
+  }
 
-	async function dump() {
-		const client = await getClient();
-		const collections = await client.db().collections();
-		const data = await Promise.all(collections.map(async collection => {
-			return new Promise((resolve, reject) => {
-				const docs = [];
+  async function dump() {
+    const client = await getClient();
+    const collections = await client.db().collections();
+    const data = await Promise.all(collections.map(collection => new Promise((resolve, reject) => {
+      const docs = [];
 
-				collection.find({})
-					.on('error', reject)
-					.on('end', () => {
-						resolve({[collection.collectionName]: docs});
-					})
-					.on('data', doc => {
-						delete doc.__v;
-						delete doc._id;
-						docs.push(JSON.parse(JSON.stringify(doc)));
-					});
-			});
-		}));
+      collection.find({})
+        .on('error', reject)
+        .on('end', () => {
+          resolve({[collection.collectionName]: docs});
+        })
+        .on('data', doc => {
+          delete doc.__v; // eslint-disable-line functional/immutable-data
+          delete doc._id; // eslint-disable-line functional/immutable-data
+          docs.push(JSON.parse(JSON.stringify(doc))); // eslint-disable-line functional/immutable-data
+        });
+    })));
 
-		await client.close();
+    await client.close();
 
-		return data.reduce((acc, collection) => {
-			return {...acc, ...collection};
-		}, {});
-	}
+    return data.reduce((acc, collection) => ({...acc, ...collection}), {});
+  }
 
-	async function getClient() {
-		return MongoClient.connect(await getConnectionString(), {useNewUrlParser: true});
-	}
+  async function getClient() {
+    return MongoClient.connect(await getUri(), {useNewUrlParser: true});
+  }
 
-	function clone(o) {
-		return JSON.parse(JSON.stringify(o));
-	}
+  function clone(o) {
+    return JSON.parse(JSON.stringify(o));
+  }
 
-	function getMongoMethods() {
-		/* istanbul ignore next: This won't be tested */
-		if ('MONGO_URI' in process.env) {
-			return {
-				getConnectionString: async () => process.env.MONGO_URI,
-				closeCallback: async () => {}
-			};
-		}
+  function getMongoMethods() {
+    /* istanbul ignore next: This won't be tested */
+    if ('MONGO_TEST_URI' in process.env) { // eslint-disable-line no-process-env
+      return {
+        getUri: () => process.env.MONGO_TEST_URI, // eslint-disable-line no-process-env
+        closeCallback: () => { } // eslint-disable-line no-empty-function
+      };
+    }
 
-		const Mongo = new MongoMemoryServer();
+    const Mongo = new MongoMemoryServer();
 
-		return {
-			getConnectionString: async () => Mongo.getConnectionString(),
-			closeCallback: async () => {
-				const {childProcess} = Mongo.getInstanceInfo();
+    return {
+      getUri: () => Mongo.getUri(),
+      closeCallback: async () => {
+        const {childProcess} = Mongo.getInstanceInfo();
 
-				if (childProcess && !childProcess.killed) {
-					await Mongo.stop();
-				}
-			}
-		};
-	}
+        if (childProcess && !childProcess.killed) { // eslint-disable-line functional/no-conditional-statement
+          await Mongo.stop();
+        }
+      }
+    };
+  }
 }

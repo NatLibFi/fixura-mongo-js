@@ -25,7 +25,7 @@ await mongoFixtures.dump();
 - **gridFS**: An optional parameter which enables using gridFS functions. Can be boolean or an object:
   - **bucketName**: The name of the gridFS bucket to create (Optional)
 ### Mongo instance
-By default, fixura-mongo uses [mongodb-memory-server](https://www.npmjs.com/package/mongodb-memory-server). For using an externally started Mongo, set environment variable `MONGO_URI`.
+By default, fixura-mongo uses [mongodb-memory-server](https://www.npmjs.com/package/mongodb-memory-server). For using an externally started Mongo, set environment variable `MONGO_TEST_URI`.
 # Usage
 ## Functions
 All functions are asynchronous.

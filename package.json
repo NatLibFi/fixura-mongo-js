@@ -26,11 +26,10 @@
 	"version": "1.2.1",
 	"main": "./dist/index.js",
 	"engines": {
-		"node": ">=8"
+		"node": "14"
 	},
 	"scripts": {
 		"prepare": "npm run build",
-		"check-deps": "npm-check;exit 0",
 		"lint": "eslint src",
 		"lint:dev": "eslint --fix src",
 		"test:base": "cross-env NODE_ENV=test nyc mocha --require @babel/register",
@@ -42,64 +41,38 @@
 		"watch": "cross-env DEBUG=1 NODE_ENV=test nodemon -w src --exec 'npm run test:dev'"
 	},
 	"dependencies": {
-		"@babel/register": "^7.4.4",
-		"@natlibfi/fixura": "^1.0.0",
+		"@babel/register": "^7.17.7",
+		"@natlibfi/fixura": "^2.2.1",
 		"mongodb": "^3.2.7",
-		"mongodb-memory-server": "6.0.2"
+		"mongodb-memory-server": "^6.0.2"
 	},
 	"devDependencies": {
-		"@babel/cli": "^7.8.3",
-		"@babel/core": "^7.8.3",
-		"@babel/preset-env": "^7.8.3",
-		"babel-eslint": "^10.0.3",
-		"babel-plugin-istanbul": "^5.2.0",
-		"chai": "^4.2.0",
-		"cross-env": "^5.2.1",
-		"eslint": "^6.8.0",
-		"eslint-config-xo": "^0.27.2",
-		"eslint-plugin-import": "^2.20.0",
-		"mocha": "^6.2.2",
-		"nodemon": "^1.19.4",
-		"npm-check": "^5.9.0",
-		"nyc": "^14.1.1"
+		"@babel/cli": "^7.17.10",
+		"@babel/core": "^7.17.10",
+		"@babel/preset-env": "^7.17.10",
+		"@babel/eslint-parser": "^7.17.0",
+		"babel-plugin-istanbul": "^6.1.1",
+    "@natlibfi/eslint-config-melinda-backend": "^2.0.0",
+		"chai": "^4.3.6",
+		"cross-env": "^7.0.3",
+		"eslint": "^8.14.0",
+		"mocha": "^10.0.0",
+		"nodemon": "^2.0.16",
+		"nyc": "^15.1.0"
 	},
 	"eslintConfig": {
-		"parser": "babel-eslint",
-		"plugins": [
-			"import"
-		],
-		"extends": [
-			"xo",
-			"plugin:import/errors"
-		],
-		"rules": {
-			"prefer-arrow-callback": [
-				"error"
-			]
-		},
-		"env": {
-			"mocha": true
-		}
-	},
-	"babel": {
-		"presets": [
-			[
-				"@babel/preset-env",
-				{
-					"targets": {
-						"node": "8"
-					}
-				}
-			]
-		],
-		"env": {
-			"test": {
-				"plugins": [
-					"istanbul"
-				]
-			}
-		}
-	},
+    "extends": "@natlibfi/melinda-backend"
+  },
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "targets": "maintained node versions"
+        }
+      ]
+    ]
+  },
 	"nyc": {
 		"exclude": [
 			"**/*.spec.js"
