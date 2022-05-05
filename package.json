@@ -23,7 +23,7 @@
 		"access": "public"
 	},
 	"license": "LGPL-3.0+",
-	"version": "1.2.1",
+	"version": "1.2.2",
 	"main": "./dist/index.js",
 	"engines": {
 		"node": "14"
@@ -52,7 +52,7 @@
 		"@babel/preset-env": "^7.17.10",
 		"@babel/eslint-parser": "^7.17.0",
 		"babel-plugin-istanbul": "^6.1.1",
-    "@natlibfi/eslint-config-melinda-backend": "^2.0.0",
+		"@natlibfi/eslint-config-melinda-backend": "^2.0.0",
 		"chai": "^4.3.6",
 		"cross-env": "^7.0.3",
 		"eslint": "^8.14.0",
@@ -61,18 +61,18 @@
 		"nyc": "^15.1.0"
 	},
 	"eslintConfig": {
-    "extends": "@natlibfi/melinda-backend"
-  },
-  "babel": {
-    "presets": [
-      [
-        "@babel/preset-env",
-        {
-          "targets": "maintained node versions"
-        }
-      ]
-    ]
-  },
+		"extends": "@natlibfi/melinda-backend"
+	},
+	"babel": {
+		"presets": [
+			[
+				"@babel/preset-env",
+				{
+					"targets": "maintained node versions"
+				}
+			]
+		]
+	},
 	"nyc": {
 		"exclude": [
 			"**/*.spec.js"
