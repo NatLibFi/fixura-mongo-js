@@ -2,6 +2,8 @@
 
 Test fixtures with MongoDB is as easy as ABC with Fixura.
 
+**MONGO 4.X COMPATIBLE, DOES NOT SUPPORT MONGO 3.X**
+
 # Usage
 ## ES modules
 ```js
@@ -90,6 +92,6 @@ await mongoFixtures.populate(['dbContents.json']);
 Removes all files from the database
 ## License and copyright
 
-Copyright (c) 2019 **University Of Helsinki (The National Library Of Finland)**
+Copyright (c) 2019-2022 **University Of Helsinki (The National Library Of Finland)**
 
-This project's source code is licensed under the terms of **GNU Lesser General Public License Version 3** or any later version.
+This project's source code is licensed under the terms of **MIT** or any later version.

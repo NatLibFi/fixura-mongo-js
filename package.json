@@ -22,11 +22,11 @@
 	"publishConfig": {
 		"access": "public"
 	},
-	"license": "LGPL-3.0+",
+	"license": "MIT",
 	"version": "1.2.2",
 	"main": "./dist/index.js",
 	"engines": {
-		"node": "14"
+		"node": "16"
 	},
 	"scripts": {
 		"prepare": "npm run build",
@@ -41,10 +41,10 @@
 		"watch": "cross-env DEBUG=1 NODE_ENV=test nodemon -w src --exec 'npm run test:dev'"
 	},
 	"dependencies": {
-		"@babel/register": "^7.17.7",
-		"@natlibfi/fixura": "^2.2.1",
-		"mongodb": "^3.2.7",
-		"mongodb-memory-server": "^6.0.2"
+		"@babel/register": "^7.18.9",
+		"@natlibfi/fixura": "^2.2.5",
+		"mongodb": "^4.10.0",
+		"mongodb-memory-server": "^8.9.3"
 	},
 	"devDependencies": {
 		"@babel/cli": "^7.17.10",
