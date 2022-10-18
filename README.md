@@ -2,7 +2,8 @@
 
 Test fixtures with MongoDB is as easy as ABC with Fixura.
 
-**MONGO 4.X COMPATIBLE, DOES NOT SUPPORT MONGO 3.X**
+**COMPATIBLE: MONGO 4.X**
+**NOT COMPATIBLE: MONGO 3.X**
 
 # Usage
 ## ES modules
