@@ -60,7 +60,7 @@ export default function ({client, rootPath, bucketName = 'fs'} = {}) {
     const result = await gridFSBucket.find({}).toArray();
     const promises = result.map(metadata => processMetadata(metadata));
     const [data] = await Promise.all(promises);
-    return data;
+    return data ? data : {};
 
     async function processMetadata({_id, filename}) {
       if (readData) { // eslint-disable-line functional/no-conditional-statement

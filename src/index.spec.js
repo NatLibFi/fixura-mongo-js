@@ -200,6 +200,15 @@ describe('index', () => {
       const data = await readStream(files.foobar);
       expect(data).to.eql(expectedData);
     });
+
+    it('Should return empty object if no files are', async () => {
+      mongoFixtures = await factory({rootPath: FIXTURES_PATH, gridFS: true});
+
+      await connectClient();
+
+      const files = await mongoFixtures.dumpFiles();
+      expect(files).to.eql({});
+    });
   });
 
   describe('#clearFiles', () => {
