@@ -1,39 +1,11 @@
-/**
-*
-* @licstart  The following is the entire license notice for the JavaScript code in this file.
-*
-* Test fixtures with MongoDB is as easy as ABC
-*
-* Copyright (C) 2019 University Of Helsinki (The National Library Of Finland)
-*
-* This file is part of fixura-mongo-js
-*
-* fixura-mongo-js program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU Lesser General Public License as
-* published by the Free Software Foundation, either version 3 of the
-* License, or (at your option) any later version.
-*
-* fixura-mongo-js is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*
-* @licend  The above is the entire license notice
-* for the JavaScript code in this file.
-*
-*/
-
-import MongoMemoryServer from 'mongodb-memory-server';
+import {MongoMemoryServer} from 'mongodb-memory-server';
 import {MongoClient, ObjectId} from 'mongodb';
 import fixturesFactory, {READERS} from '@natlibfi/fixura';
 import gridFSFactory from './gridfs';
 
 export default async function ({rootPath, gridFS = false, useObjectId = false, format} = {}) {
   const {getFixture} = fixturesFactory({root: rootPath, reader: READERS.JSON});
-  const {getUri, closeCallback} = getMongoMethods();
+  const {getUri, closeCallback} = await getMongoMethods();
 
   if (gridFS) {
     const {populateFiles, dumpFiles, clearFiles} = gridFSFactory({client: await getClient(), rootPath, ...gridFS});
@@ -110,20 +82,10 @@ export default async function ({rootPath, gridFS = false, useObjectId = false, f
   async function dump() {
     const client = await getClient();
     const collections = await client.db().collections();
-    const data = await Promise.all(collections.map(collection => new Promise((resolve, reject) => {
-      const docs = [];
-
-      collection.find({})
-        .on('error', reject)
-        .on('end', () => {
-          resolve({[collection.collectionName]: docs});
-        })
-        .on('data', doc => {
-          delete doc.__v; // eslint-disable-line functional/immutable-data
-          delete doc._id; // eslint-disable-line functional/immutable-data
-          docs.push(JSON.parse(JSON.stringify(doc))); // eslint-disable-line functional/immutable-data
-        });
-    })));
+    const data = await Promise.all(collections.map(async collection => {
+      const results = await collection.find({}, {projection: {_id: 0}}).toArray();
+      return {[collection.collectionName]: results};
+    }));
 
     await client.close();
 
@@ -138,7 +100,7 @@ export default async function ({rootPath, gridFS = false, useObjectId = false, f
     return JSON.parse(JSON.stringify(o));
   }
 
-  function getMongoMethods() {
+  async function getMongoMethods() {
     /* istanbul ignore next: This won't be tested */
     if ('MONGO_TEST_URI' in process.env) { // eslint-disable-line no-process-env
       return {
@@ -147,16 +109,12 @@ export default async function ({rootPath, gridFS = false, useObjectId = false, f
       };
     }
 
-    const Mongo = new MongoMemoryServer();
+    const Mongo = await MongoMemoryServer.create();
 
     return {
       getUri: () => Mongo.getUri(),
       closeCallback: async () => {
-        const {childProcess} = Mongo.getInstanceInfo();
-
-        if (childProcess && !childProcess.killed) { // eslint-disable-line functional/no-conditional-statement
-          await Mongo.stop();
-        }
+        await Mongo.stop();
       }
     };
   }

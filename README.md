@@ -2,6 +2,9 @@
 
 Test fixtures with MongoDB is as easy as ABC with Fixura.
 
+**COMPATIBLE: MONGO 4.X**
+**NOT COMPATIBLE: MONGO 3.X**
+
 # Usage
 ## ES modules
 ```js
@@ -45,7 +48,7 @@ Dumps the database in the same format as the fixture.
 Clears the database.
 ### close
 Clears and stops the database (Stopping is only applicable to mongodb-memory-server),
-### getConnectionString
+### getUri
 Returns the URI of the server. Used for connecting clients to the database.
 ### populateFiles (GridFS)
 Populates the database with files using [GridFS](https://docs.mongodb.com/manual/core/gridfs/). The format is as follows:
@@ -87,9 +90,84 @@ const mongoFixtures = await fixturesFactory({
 await mongoFixtures.populate(['dbContents.json']);
 
 ```
+
+## Example with fixugen
+```js
+
+describe('Stuff/to/be/tested', () => {
+  let mongoFixtures; // eslint-disable-line functional/no-let
+
+  generateTests({
+    callback,
+    path: [__dirname, '..', '..', 'test-fixtures', 'path', 'to', 'tests'],
+    recurse: false,
+    useMetadataFile: true,
+    fixura: {
+      failWhenNotFound: true,
+      reader: READERS.JSON
+    },
+    mocha: {
+      before: async () => {
+        mongoFixtures = await mongoFixturesFactory({
+          rootPath: [__dirname, '..', '..', 'test-fixtures', 'path', 'to', 'tests'],
+          gridFS: {bucketName: 'blobs'},
+          useObjectId: true,
+          format: {
+            blobmetadatas: {
+              creationTime: v => new Date(v),
+              modificationTime: v => new Date(v)
+            }
+          }
+        });
+        //TODO connect to mongo (await mongoFixtures.getUri())
+      },
+      beforeEach: async () => {
+        await mongoFixtures.clear();
+      },
+      afterEach: async () => {
+        await mongoFixtures.clear();
+      },
+      after: async () => {
+        // TODO Disconnect from mongofixtures
+        await mongoFixtures.close();
+      }
+    }
+  });
+
+  async function callback({
+    getFixture,
+    expectToFail = false,
+    expectedFailStatus = ''
+  }) {
+    try {
+      const dbContents = getFixture('dbContents.json');
+      const expectedDb = getFixture('expectedDb.json');
+
+      // TODO load operation related stuff
+
+      await mongoFixtures.populate(dbContents);
+
+      // TODO stuff to mongo db
+
+      const db = await mongoFixtures.dump();
+
+      expect(db).to.eql(expectedDb);
+      expect(expectToFail, 'This is expected to succes').to.equal(false);
+    } catch (error) {
+      if (!expectToFail) {
+        throw error;
+      }
+      expect(expectToFail, 'This is expected to fail').to.equal(true);
+      expect(error).to.be.an.instanceOf(ApiError);
+      expect(error.status).to.equal(expectedFailStatus);
+    }
+  }
+});
+```
+
 Removes all files from the database
 ## License and copyright
 
-Copyright (c) 2019 **University Of Helsinki (The National Library Of Finland)**
+Copyright (c) 2019-2022 **University Of Helsinki (The National Library Of Finland)**
 
-This project's source code is licensed under the terms of **GNU Lesser General Public License Version 3** or any later version.
+This project's source code is licensed under the terms of **MIT** or any later version.

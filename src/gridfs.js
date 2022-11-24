@@ -1,31 +1,3 @@
-/**
-*
-* @licstart  The following is the entire license notice for the JavaScript code in this file.
-*
-* Test fixtures with MongoDB is as easy as ABC
-*
-* Copyright (C) 2019 University Of Helsinki (The National Library Of Finland)
-*
-* This file is part of fixura-mongo-js
-*
-* fixura-mongo-js program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU Lesser General Public License as
-* published by the Free Software Foundation, either version 3 of the
-* License, or (at your option) any later version.
-*
-* fixura-mongo-js is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*
-* @licend  The above is the entire license notice
-* for the JavaScript code in this file.
-*
-*/
-
 import {GridFSBucket, MongoError} from 'mongodb';
 import fixturesFactory, {READERS} from '@natlibfi/fixura';
 
@@ -84,7 +56,37 @@ export default function ({client, rootPath, bucketName = 'fs'} = {}) {
     }));
   }
 
-  function dumpFiles(readData = false) {
+  async function dumpFiles(readData = false) {
+    const result = await gridFSBucket.find({}).toArray();
+    const promises = result.map(metadata => processMetadata(metadata));
+    const [data] = await Promise.all(promises);
+    return data ? data : {};
+
+    async function processMetadata({_id, filename}) {
+      if (readData) { // eslint-disable-line functional/no-conditional-statement
+        const temp = {};
+        temp[filename] = await readFromFile(); // eslint-disable-line functional/immutable-data
+        return temp;
+      }
+
+      const temp = {};
+      temp[filename] = gridFSBucket.openDownloadStream(_id); // eslint-disable-line functional/immutable-data
+      return temp;
+
+      function readFromFile() {
+        return new Promise((resolve, reject) => {
+          const chunks = [];
+
+          gridFSBucket.openDownloadStream(_id)
+            .setEncoding('utf8')
+            .on('error', reject)
+            .on('data', chunk => chunks.push(chunk)) // eslint-disable-line functional/immutable-data
+            .on('end', () => resolve(chunks.join('')));
+        });
+      }
+    }
+
+    /*
     return new Promise((resolve, reject) => {
       const processors = [];
       const data = {};
@@ -118,5 +120,6 @@ export default function ({client, rootPath, bucketName = 'fs'} = {}) {
         }
       }
     });
+    /**/
   }
 }
