@@ -11,7 +11,7 @@ describe('index', () => {
   const {getFixture} = fixturesFactory({root: FIXTURES_PATH, reader: READERS.JSON});
 
   afterEach(async () => {
-    if (client) { // eslint-disable-line functional/no-conditional-statement
+    if (client) { // eslint-disable-line functional/no-conditional-statements
       await client.close();
     }
 

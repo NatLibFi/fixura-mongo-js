@@ -63,7 +63,7 @@ export default function ({client, rootPath, bucketName = 'fs'} = {}) {
     return data ? data : {};
 
     async function processMetadata({_id, filename}) {
-      if (readData) { // eslint-disable-line functional/no-conditional-statement
+      if (readData) { // eslint-disable-line functional/no-conditional-statements
         const temp = {};
         temp[filename] = await readFromFile(); // eslint-disable-line functional/immutable-data
         return temp;
@@ -101,9 +101,9 @@ export default function ({client, rootPath, bucketName = 'fs'} = {}) {
         });
 
       async function processMetadata(metadata) {
-        if (readData) { // eslint-disable-line functional/no-conditional-statement
+        if (readData) { // eslint-disable-line functional/no-conditional-statements
           data[metadata.filename] = await readFromFile(); // eslint-disable-line functional/immutable-data
-        } else { // eslint-disable-line functional/no-conditional-statement
+        } else { // eslint-disable-line functional/no-conditional-statements
           data[metadata.filename] = gridFSBucket.openDownloadStream(metadata._id); // eslint-disable-line functional/immutable-data
         }
 
