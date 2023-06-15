@@ -40,7 +40,7 @@ export default async function ({rootPath, gridFS = false, useObjectId = false, f
     await Promise.all(Object.keys(data).map(async name => {
       const collection = await client.db().createCollection(name);
 
-      if (format && name in format) { // eslint-disable-line functional/no-conditional-statement
+      if (format && name in format) { // eslint-disable-line functional/no-conditional-statements
         data[name] = data[name].map(formatValues); // eslint-disable-line functional/immutable-data
       }
 
