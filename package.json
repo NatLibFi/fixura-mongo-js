@@ -44,7 +44,7 @@
 		"@babel/register": "^7.22.15",
 		"@natlibfi/fixura": "^3.0.2",
 		"mongodb": "^5.9.0",
-		"mongodb-memory-server": "^8.16.0"
+		"mongodb-memory-server": "^9.0.1"
 	},
 	"devDependencies": {
 		"@babel/cli": "^7.23.0",
@@ -77,8 +77,7 @@
 			"**/*.spec.js"
 		],
 		"reporter": [
-			"lcov",
-			"html"
+			"text"
 		],
 		"require": [
 			"@babel/register"
