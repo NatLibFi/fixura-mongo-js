@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 import {MongoClient, GridFSBucket} from 'mongodb';
-import factory from './index';
+import factory from './index.js';
 import fixturesFactory, {READERS} from '@natlibfi/fixura';
 
 describe('index', () => {
@@ -231,7 +231,7 @@ describe('index', () => {
 
   async function connectClient() {
     const connectionUri = await mongoFixtures.getUri();
-    client = await MongoClient.connect(connectionUri, {useNewUrlParser: true});
+    client = await MongoClient.connect(connectionUri, {});
   }
 
   function populate(input) {

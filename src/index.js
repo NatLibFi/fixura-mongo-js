@@ -1,7 +1,7 @@
 import {MongoMemoryServer} from 'mongodb-memory-server';
 import {MongoClient, ObjectId} from 'mongodb';
 import fixturesFactory, {READERS} from '@natlibfi/fixura';
-import gridFSFactory from './gridfs';
+import gridFSFactory from './gridfs.js';
 
 export default async function ({rootPath, gridFS = false, useObjectId = false, format} = {}) {
   const {getFixture} = fixturesFactory({root: rootPath, reader: READERS.JSON});
@@ -93,7 +93,7 @@ export default async function ({rootPath, gridFS = false, useObjectId = false, f
   }
 
   async function getClient() {
-    return MongoClient.connect(await getUri(), {useNewUrlParser: true});
+    return MongoClient.connect(await getUri(), {});
   }
 
   function clone(o) {
