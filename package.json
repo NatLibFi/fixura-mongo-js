@@ -1,93 +1,118 @@
 {
-	"name": "@natlibfi/fixura-mongo",
-	"description": "Test fixtures with MongoDB is as easy as ABC",
-	"author": {
-		"name": "The National Library of Finland"
-	},
-	"keywords": [
-		"fixture",
-		"test",
-		"unit",
-		"mongo",
-		"gridfs"
-	],
-	"homepage": "https://github.com/natlibfi/fixura-mongo-js",
-	"bugs": {
-		"url": "https://github.com/natlibfi/fixura-mongo-js/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git@github.com:natlibfi/fixura-mongo-js.git"
-	},
-	"publishConfig": {
-		"access": "public"
-	},
-	"license": "MIT",
-	"version": "2.0.13",
-	"main": "./dist/index.js",
-	"engines": {
-		"node": ">=18"
-	},
-	"scripts": {
-		"prepare": "npm run build",
-		"lint": "eslint src",
-		"lint:dev": "eslint --fix src",
-		"test:base": "cross-env NODE_ENV=test nyc mocha --require @babel/register",
-		"test": "npm run lint && npm run test:base -- --exit src/*.spec.js && npm run coverage",
-		"test:dev": "npm run lint:dev && npm run test:base -- --exit src/*.spec.js && npm run coverage",
-		"coverage": "nyc check-coverage --per-file",
-		"build": "babel src --source-maps --delete-dir-on-start --out-dir=dist",
-		"build:dev": "npm run build && npm run check-deps",
-		"watch": "cross-env DEBUG=1 NODE_ENV=test nodemon -w src --exec 'npm run test:dev'"
-	},
-	"dependencies": {
-		"@babel/register": "^7.22.15",
-		"@natlibfi/fixura": "^3.0.2",
-		"mongodb": "^5.9.0",
-		"mongodb-memory-server": "^8.16.0"
-	},
-	"devDependencies": {
-		"@babel/cli": "^7.23.0",
-		"@babel/core": "^7.23.2",
-		"@babel/preset-env": "^7.23.2",
-		"@natlibfi/eslint-config-melinda-backend": "^3.0.2",
-		"babel-plugin-istanbul": "^6.1.1",
-		"chai": "^4.3.10",
-		"cross-env": "^7.0.3",
-		"eslint": "^8.51.0",
-		"mocha": "^10.2.0",
-		"nodemon": "^3.0.1",
-		"nyc": "^15.1.0"
-	},
-	"eslintConfig": {
-		"extends": "@natlibfi/melinda-backend"
-	},
-	"babel": {
-		"presets": [
-			[
-				"@babel/preset-env",
-				{
-					"targets": "maintained node versions"
-				}
-			]
-		]
-	},
-	"nyc": {
-		"exclude": [
-			"**/*.spec.js"
-		],
-		"reporter": [
-			"lcov",
-			"html"
-		],
-		"require": [
-			"@babel/register"
-		],
-		"sourceMap": false,
-		"instrument": false,
-		"lines": 80,
-		"statements": 80,
-		"functions": 80,
-		"branches": 80
-	}
+  "name": "@natlibfi/fixura-mongo",
+  "description": "Test fixtures with MongoDB is as easy as ABC",
+  "author": {
+    "name": "The National Library of Finland"
+  },
+  "keywords": [
+    "fixture",
+    "test",
+    "unit",
+    "mongo",
+    "gridfs"
+  ],
+  "homepage": "https://github.com/natlibfi/fixura-mongo-js",
+  "bugs": {
+    "url": "https://github.com/natlibfi/fixura-mongo-js/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:natlibfi/fixura-mongo-js.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "version": "2.0.13",
+  "main": "./dist/index.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "babel src --source-maps --delete-dir-on-start --out-dir=dist",
+    "lint": "eslint src",
+    "lint:dev": "eslint --fix src",
+    "prepare": "npm run build",
+    "test": "npm run lint && npm run test:base",
+    "test:base": "cross-env NODE_ENV=test nyc mocha --package package.json --exit",
+    "test:dev": "npm run lint:dev && npm run test:base",
+    "watch": "cross-env DEBUG=@natlibfi/* NODE_ENV=test nodemon"
+  },
+  "dependencies": {
+    "@babel/register": "^7.23.7",
+    "@natlibfi/fixura": "^3.0.4",
+    "mongodb": "^6.3.0",
+    "mongodb-memory-server": "^8.16.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.23.9",
+    "@babel/core": "^7.24.0",
+    "@babel/eslint-parser": "^7.23.3",
+    "@babel/node": "^7.22.19",
+    "@babel/preset-env": "^7.24.0",
+    "@natlibfi/eslint-config-melinda-backend": "^3.0.4",
+    "babel-plugin-istanbul": "^6.1.1",
+    "chai": "^4.4.1",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.57.0",
+    "mocha": "^10.3.0",
+    "nodemon": "^3.1.0",
+    "nyc": "^15.1.0"
+  },
+  "eslintConfig": {
+    "extends": "@natlibfi/melinda-backend"
+  },
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "targets": [
+            "last 2 versions",
+            "maintained node versions"
+          ]
+        }
+      ]
+    ],
+    "env": {
+      "test": {
+        "plugins": [
+          "istanbul"
+        ]
+      }
+    }
+  },
+  "mocha": {
+    "spec": [
+      "src/*.spec.js"
+    ],
+    "require": [
+      "@babel/register"
+    ],
+    "bail": true
+  },
+  "nodemonConfig": {
+    "exec": "npm run test:dev",
+    "watch": [
+      "src/*",
+      "test-fixtures/*"
+    ]
+  },
+  "nyc": {
+    "exclude": [
+      "src/*.spec.js"
+    ],
+    "reporter": [
+      "text"
+    ],
+    "require": [
+      "@babel/register"
+    ],
+    "sourceMap": false,
+    "instrument": false,
+    "lines": 80,
+    "statements": 80,
+    "functions": 80,
+    "branches": 80
+  }
 }
