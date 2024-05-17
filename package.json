@@ -41,7 +41,7 @@
   "dependencies": {
     "@babel/register": "^7.23.7",
     "@natlibfi/fixura": "^3.0.5",
-    "mongodb": "^6.6.1",
+    "mongodb": "^6.6.2",
     "mongodb-memory-server": "^8.16.0"
   },
   "devDependencies": {
