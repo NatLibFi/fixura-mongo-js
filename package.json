@@ -39,24 +39,24 @@
     "watch": "cross-env DEBUG=@natlibfi/* NODE_ENV=test nodemon"
   },
   "dependencies": {
-    "@babel/register": "^7.23.7",
-    "@natlibfi/fixura": "^3.0.5",
-    "mongodb": "^6.6.2",
+    "@babel/register": "^7.24.6",
+    "@natlibfi/fixura": "^3.0.7",
+    "mongodb": "^6.8.0",
     "mongodb-memory-server": "^8.16.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.24.5",
-    "@babel/core": "^7.24.5",
-    "@babel/eslint-parser": "^7.24.5",
-    "@babel/node": "^7.23.9",
-    "@babel/preset-env": "^7.24.5",
+    "@babel/cli": "^7.24.7",
+    "@babel/core": "^7.24.7",
+    "@babel/eslint-parser": "^7.24.7",
+    "@babel/node": "^7.24.7",
+    "@babel/preset-env": "^7.24.7",
     "@natlibfi/eslint-config-melinda-backend": "^3.0.5",
     "babel-plugin-istanbul": "^6.1.1",
     "chai": "^4.4.1",
     "cross-env": "^7.0.3",
     "eslint": "^8.57.0",
-    "mocha": "^10.4.0",
-    "nodemon": "^3.1.0",
+    "mocha": "^10.6.0",
+    "nodemon": "^3.1.4",
     "nyc": "^15.1.0"
   },
   "eslintConfig": {
