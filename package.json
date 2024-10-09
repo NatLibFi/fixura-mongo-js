@@ -23,7 +23,7 @@
     "access": "public"
   },
   "license": "MIT",
-  "version": "2.0.18",
+  "version": "2.0.19-alpha.1",
   "main": "./dist/index.js",
   "engines": {
     "node": ">=18"
@@ -42,7 +42,7 @@
     "@babel/register": "^7.24.6",
     "@natlibfi/fixura": "^3.0.7",
     "mongodb": "^6.8.0",
-    "mongodb-memory-server": "^8.16.0"
+    "mongodb-memory-server": "^10.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.24.7",
