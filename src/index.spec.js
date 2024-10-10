@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 import {MongoClient, GridFSBucket} from 'mongodb';
-import factory from './index.js';
+import factory from './index';
 import fixturesFactory, {READERS} from '@natlibfi/fixura';
 
 describe('index', () => {
