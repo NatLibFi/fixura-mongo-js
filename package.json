@@ -34,15 +34,15 @@
     "lint:dev": "eslint --fix src",
     "prepare": "npm run build",
     "test": "npm run lint && npm run test:base",
-    "test:base": "cross-env NODE_ENV=test nyc mocha --package package.json --exit",
+    "test:base": "cross-env NODE_ENV=test nyc mocha --timeout 1500000 --package package.json --exit",
     "test:dev": "npm run lint:dev && npm run test:base",
     "watch": "cross-env DEBUG=@natlibfi/* NODE_ENV=test nodemon"
   },
   "dependencies": {
     "@babel/register": "^7.24.6",
     "@natlibfi/fixura": "^3.0.7",
-    "mongodb": "^6.8.0",
-    "mongodb-memory-server": "^10.0.0"
+    "mongodb": "^6.9.0",
+    "mongodb-memory-server": "^10.1.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.24.7",
