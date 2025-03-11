@@ -23,7 +23,7 @@
     "access": "public"
   },
   "license": "MIT",
-  "version": "2.0.21",
+  "version": "2.0.22-alpha.1",
   "main": "./dist/index.js",
   "engines": {
     "node": ">=18"
@@ -39,25 +39,25 @@
     "watch": "cross-env DEBUG=@natlibfi/* NODE_ENV=test nodemon"
   },
   "dependencies": {
-    "@babel/register": "^7.24.6",
-    "@natlibfi/fixura": "^3.0.10",
-    "mongodb": "^6.9.0",
-    "mongodb-memory-server": "^10.1.2"
+    "@babel/register": "^7.25.9",
+    "@natlibfi/fixura": "^3.0.12",
+    "mongodb": "^6.14.2",
+    "mongodb-memory-server": "^10.1.4"
   },
   "devDependencies": {
-    "@babel/cli": "^7.24.7",
-    "@babel/core": "^7.24.7",
-    "@babel/eslint-parser": "^7.24.7",
-    "@babel/node": "^7.24.7",
-    "@babel/preset-env": "^7.24.7",
+    "@babel/cli": "^7.26.4",
+    "@babel/core": "^7.26.9",
+    "@babel/eslint-parser": "^7.26.8",
+    "@babel/node": "^7.26.0",
+    "@babel/preset-env": "^7.26.9",
     "@natlibfi/eslint-config-melinda-backend": "^3.0.5",
     "babel-plugin-istanbul": "^6.1.1",
-    "chai": "^4.4.1",
+    "chai": "^4.5.0",
     "cross-env": "^7.0.3",
-    "eslint": "^8.57.0",
-    "mocha": "^10.6.0",
-    "nodemon": "^3.1.4",
-    "nyc": "^15.1.0"
+    "eslint": "^8.57.1",
+    "mocha": "^11.1.0",
+    "nodemon": "^3.1.9",
+    "nyc": "^17.1.0"
   },
   "eslintConfig": {
     "extends": "@natlibfi/melinda-backend"

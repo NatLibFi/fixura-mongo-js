@@ -168,6 +168,6 @@ describe('Stuff/to/be/tested', () => {
 Removes all files from the database
 ## License and copyright
 
-Copyright (c) 2019-2022, 2024 **University Of Helsinki (The National Library Of Finland)**
+Copyright (c) 2019-2022, 2024-2025 **University Of Helsinki (The National Library Of Finland)**
 
 This project's source code is licensed under the terms of **MIT** or any later version.
