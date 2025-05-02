@@ -23,7 +23,7 @@
     "access": "public"
   },
   "license": "MIT",
-  "version": "2.0.24-alpha.1",
+  "version": "2.0.24",
   "main": "./dist/index.js",
   "engines": {
     "node": ">=18"
