@@ -35,7 +35,7 @@ export default function ({client, rootPath, bucketName = 'fs'} = {}) {
       }
 
       return new Promise((resolve, reject) => {
-        const components = data[filename]; // eslint-disable-line
+        const components = data[filename];
         const inputStream = getFixture({components});
         const outputStream = gridFSBucket.openUploadStream(filename);
 
@@ -63,14 +63,14 @@ export default function ({client, rootPath, bucketName = 'fs'} = {}) {
     return data ? data : {};
 
     async function processMetadata({_id, filename}) {
-      if (readData) { // eslint-disable-line functional/no-conditional-statements
+      if (readData) {
         const temp = {};
-        temp[filename] = await readFromFile(); // eslint-disable-line functional/immutable-data
+        temp[filename] = await readFromFile();
         return temp;
       }
 
       const temp = {};
-      temp[filename] = gridFSBucket.openDownloadStream(_id); // eslint-disable-line functional/immutable-data
+      temp[filename] = gridFSBucket.openDownloadStream(_id);
       return temp;
 
       function readFromFile() {
@@ -80,7 +80,7 @@ export default function ({client, rootPath, bucketName = 'fs'} = {}) {
           gridFSBucket.openDownloadStream(_id)
             .setEncoding('utf8')
             .on('error', reject)
-            .on('data', chunk => chunks.push(chunk)) // eslint-disable-line functional/immutable-data
+            .on('data', chunk => chunks.push(chunk))
             .on('end', () => resolve(chunks.join('')));
         });
       }
@@ -94,7 +94,7 @@ export default function ({client, rootPath, bucketName = 'fs'} = {}) {
       gridFSBucket.find({})
         .on('error', reject)
         // The callback must be pushed to a list of promises because 'end' event might be dispatched before all data has been processed
-        .on('data', metadata => processors.push(processMetadata(metadata))) // eslint-disable-line functional/immutable-data
+        .on('data', metadata => processors.push(processMetadata(metadata)))
         .on('end', async () => {
           await Promise.all(processors);
           resolve(data);
@@ -102,9 +102,9 @@ export default function ({client, rootPath, bucketName = 'fs'} = {}) {
 
       async function processMetadata(metadata) {
         if (readData) { // eslint-disable-line functional/no-conditional-statements
-          data[metadata.filename] = await readFromFile(); // eslint-disable-line functional/immutable-data
+          data[metadata.filename] = await readFromFile();
         } else { // eslint-disable-line functional/no-conditional-statements
-          data[metadata.filename] = gridFSBucket.openDownloadStream(metadata._id); // eslint-disable-line functional/immutable-data
+          data[metadata.filename] = gridFSBucket.openDownloadStream(metadata._id);
         }
 
         function readFromFile() {
@@ -114,7 +114,7 @@ export default function ({client, rootPath, bucketName = 'fs'} = {}) {
             gridFSBucket.openDownloadStream(metadata._id)
               .setEncoding('utf8')
               .on('error', reject)
-              .on('data', chunk => chunks.push(chunk)) // eslint-disable-line functional/immutable-data
+              .on('data', chunk => chunks.push(chunk))
               .on('end', () => resolve(chunks.join('')));
           });
         }

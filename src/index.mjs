@@ -1,7 +1,7 @@
 import {MongoMemoryServer} from 'mongodb-memory-server';
 import {MongoClient, ObjectId} from 'mongodb';
 import fixturesFactory, {READERS} from '@natlibfi/fixura';
-import gridFSFactory from './gridfs';
+import gridFSFactory from './gridfs.mjs';
 
 export default async function ({rootPath, gridFS = false, useObjectId = false, format} = {}) {
   const {getFixture} = fixturesFactory({root: rootPath, reader: READERS.JSON});
@@ -40,8 +40,8 @@ export default async function ({rootPath, gridFS = false, useObjectId = false, f
     await Promise.all(Object.keys(data).map(async name => {
       const collection = await client.db().createCollection(name);
 
-      if (format && name in format) { // eslint-disable-line functional/no-conditional-statements
-        data[name] = data[name].map(formatValues); // eslint-disable-line functional/immutable-data
+      if (format && name in format) {
+        data[name] = data[name].map(formatValues);
       }
 
       if (useObjectId) {

@@ -1,81 +1,90 @@
-import {expect} from 'chai';
 import {MongoClient, GridFSBucket} from 'mongodb';
-import factory from './index';
+import factory from './index.mjs';
+import {describe, it, afterEach} from 'node:test';
+import assert from 'node:assert';
 import fixturesFactory, {READERS} from '@natlibfi/fixura';
 
-describe('index', () => {
-  let client; // eslint-disable-line functional/no-let
-  let mongoFixtures; // eslint-disable-line functional/no-let
+describe('index', {only: false, skip: false}, async () => {
+  let client;
+  let mongoFixtures;
 
-  const FIXTURES_PATH = [__dirname, '..', 'test-fixtures'];
+  const FIXTURES_PATH = [import.meta.dirname, '..', 'test-fixtures'];
   const {getFixture} = fixturesFactory({root: FIXTURES_PATH, reader: READERS.JSON});
 
-  afterEach(async () => {
-    if (client) { // eslint-disable-line functional/no-conditional-statements
-      await client.close();
-    }
+  describe('#getConnectionString', {only: false, skip: false}, async () => {
+    afterEach(async () => {
+      if (client) {
+        await client.close();
+      }
 
-    await mongoFixtures.close();
-  });
+      await mongoFixtures.close();
+    });
 
-  describe('#getConnectionString', () => {
-    it('Should return a valid connection string', async () => {
+    it('Should return a valid connection string', {only: false, skip: false}, async () => {
       mongoFixtures = await factory();
       await connectClient();
-      expect((/^mongodb:\/\//u).test(client.s.url)).to.equal(true);
+      assert.match(client.s.url, (/^mongodb:\/\//u));
     });
   });
 
-  describe('#populate', () => {
-    it('Should populate the db', async (index = '0') => {
-      const db = getFixture({components: ['populate', index, 'db.json']});
+  describe('#populate', {only: false, skip: false}, () => {
+    afterEach(async () => {
+      if (client) {
+        await client.close();
+      }
+
+      await mongoFixtures.close();
+    });
+
+    it('Should populate the db', {only: false, skip: false}, async () => {
+      const db = getFixture({components: ['populate', '0', 'db.json']});
       mongoFixtures = await factory();
 
       await connectClient();
       await mongoFixtures.populate(db);
       const collections = await client.db().collections();
 
-      expect(collections).to.have.lengthOf(1);
-      expect(collections[0].collectionName).to.equal('fubar');
+      assert.equal(collections.length, 1);
+      assert.equal(collections[0].collectionName, 'fubar');
+
       const docs = await getDocuments(collections[0]);
-      expect(docs).to.eql(db.fubar);
+      assert.deepStrictEqual(docs, db.fubar);
     });
 
-    it('Should populate the db using file path as input', async (index = '1') => {
-      const db = getFixture({components: ['populate', index, 'db.json']});
+    it('Should populate the db using file path as input', {only: false, skip: false}, async () => {
+      const db = getFixture({components: ['populate', '1', 'db.json']});
       mongoFixtures = await factory({rootPath: FIXTURES_PATH});
 
       await connectClient();
-      await mongoFixtures.populate(['populate', index, 'db.json']);
+      await mongoFixtures.populate(['populate', '1', 'db.json']);
 
       const collections = await client.db().collections();
 
-      expect(collections).to.have.lengthOf(1);
-      expect(collections[0].collectionName).to.equal('fubar');
+      assert.equal(collections.length, 1);
+      assert.equal(collections[0].collectionName, 'fubar');
 
       const docs = await getDocuments(collections[0], {includeId: true});
-
-      expect(docs).to.eql(db.fubar);
+      assert.deepStrictEqual(docs, db.fubar);
     });
 
-    it('Should populate the db and convert "_id"-properties to ObjectId objects', async (index = '2') => {
-      const db = getFixture({components: ['populate', index, 'db.json']});
+    it('Should populate the db and convert "_id"-properties to ObjectId objects', {only: false, skip: false}, async () => {
+      const db = getFixture({components: ['populate', '2', 'db.json']});
       mongoFixtures = await factory({rootPath: FIXTURES_PATH, useObjectId: true});
 
       await connectClient();
-      await mongoFixtures.populate(['populate', index, 'db.json']);
+      await mongoFixtures.populate(['populate', '2', 'db.json']);
 
       const collections = await client.db().collections();
 
-      expect(collections).to.have.lengthOf(1);
-      expect(collections[0].collectionName).to.equal('fubar');
+      assert.equal(collections.length, 1);
+      assert.equal(collections[0].collectionName, 'fubar');
 
       const docs = await getDocuments(collections[0]);
-      expect(docs).to.eql(db.fubar);
+      assert.deepStrictEqual(docs, db.fubar);
     });
 
-    it('Should populate the db and format values', async (index = '3') => {
-      const db = getFixture({components: ['populate', index, 'db.json']});
+    it('Should populate the db and format values', {only: false, skip: false}, async () => {
+      const db = getFixture({components: ['populate', '3', 'db.json']});
 
       mongoFixtures = await factory({
         rootPath: FIXTURES_PATH, format: {
@@ -84,38 +93,53 @@ describe('index', () => {
       });
 
       // Expectation
-      db.fubar[0].foo = 'foo'; // eslint-disable-line functional/immutable-data
+      db.fubar[0].foo = 'foo';
 
       await connectClient();
-      await mongoFixtures.populate(['populate', index, 'db.json']);
+      await mongoFixtures.populate(['populate', '3', 'db.json']);
 
       const collections = await client.db().collections();
 
-      expect(collections).to.have.lengthOf(1);
-      expect(collections[0].collectionName).to.equal('fubar');
+      assert.equal(collections.length, 1);
+      assert.equal(collections[0].collectionName, 'fubar');
 
       const docs = await getDocuments(collections[0]);
-      expect(docs).to.eql(db.fubar);
+      assert.deepStrictEqual(docs, db.fubar);
     });
   });
 
-  describe('#dump', () => {
-    it('Should dump the database', async (index = '0') => {
-      const db = getFixture({components: ['dump', index, 'db.json']});
+  describe('#dump', {only: false, skip: false}, () => {
+    afterEach(async () => {
+      if (client) {
+        await client.close();
+      }
+
+      await mongoFixtures.close();
+    });
+
+    it('Should dump the database', {only: false, skip: false}, async () => {
+      const db = getFixture({components: ['dump', '0', 'db.json']});
       mongoFixtures = await factory();
 
       await connectClient();
       await populate(db);
 
       const dumpedDb = await mongoFixtures.dump();
-
-      expect(dumpedDb).to.eql(db);
+      assert.deepStrictEqual(dumpedDb, db);
     });
   });
 
-  describe('#clear', () => {
-    it('Should clear the database', async (index = '0') => {
-      const db = getFixture({components: ['clear', index, 'db.json']});
+  describe('#clear', {only: false, skip: false}, () => {
+    afterEach(async () => {
+      if (client) {
+        await client.close();
+      }
+
+      await mongoFixtures.close();
+    });
+
+    it('Should clear the database', async () => {
+      const db = getFixture({components: ['clear', '0', 'db.json']});
       mongoFixtures = await factory();
 
       await connectClient();
@@ -123,14 +147,22 @@ describe('index', () => {
       await mongoFixtures.clear();
 
       const collections = await client.db().collections();
-      expect(collections).to.have.lengthOf(0);
+      assert.equal(collections.length, 0);
     });
   });
 
-  describe('#populateFiles', () => {
-    it('Should populate the database with files', async (index = '0') => {
-      const expectedDb = getFixture({components: ['populateFiles', index, 'expectedDb.json']});
-      const data = getFixture({components: ['populateFiles', index, 'data.txt'], reader: READERS.TEXT});
+  describe('#populateFiles', {only: false, skip: false}, async () => {
+    afterEach(async () => {
+      if (client) {
+        await client.close();
+      }
+      await mongoFixtures.close();
+    });
+
+
+    it('Should populate the database with files', {only: false, skip: false}, async () => {
+      const expectedDb = getFixture({components: ['populateFiles', '0', 'expectedDb.json']});
+      const data = getFixture({components: ['populateFiles', '0', 'data.txt'], reader: READERS.TEXT});
       const inputFiles = {
         foobar: data
       };
@@ -143,15 +175,15 @@ describe('index', () => {
       const collections = await client.db().collections();
       const db = await getDocuments(collections);
 
-      expect(db).to.eql(expectedDb);
-      expect(await getFiles(db)).to.eql([data]);
+      assert.deepStrictEqual(db, expectedDb);
+      assert.deepStrictEqual(await getFiles(db), [data]);
     });
 
-    it('Should populate the database with files using file paths', async (index = '1') => {
-      const expectedDb = getFixture({components: ['populateFiles', index, 'expectedDb.json']});
-      const data = getFixture({components: ['populateFiles', index, 'data.txt'], reader: READERS.TEXT});
+    it('Should populate the database with files using file paths', {only: false, skip: false}, async () => {
+      const expectedDb = getFixture({components: ['populateFiles', '1', 'expectedDb.json']});
+      const data = getFixture({components: ['populateFiles', '1', 'data.txt'], reader: READERS.TEXT});
       const inputFiles = {
-        foobar: ['populateFiles', index, 'data.txt']
+        foobar: ['populateFiles', '1', 'data.txt']
       };
 
       mongoFixtures = await factory({rootPath: FIXTURES_PATH, gridFS: true});
@@ -162,14 +194,23 @@ describe('index', () => {
       const collections = await client.db().collections();
       const db = await getDocuments(collections);
 
-      expect(db).to.eql(expectedDb);
-      expect(await getFiles(db)).to.eql([data]);
+      assert.deepStrictEqual(db, expectedDb);
+      const dataFiles = await getFiles(db);
+      assert.deepEqual(dataFiles, [data]);
     });
   });
 
-  describe('#dumpFiles', () => {
-    it('Should dump files from the database', async (index = '0') => {
-      const data = getFixture({components: ['dumpFiles', index, 'data.txt'], reader: READERS.TEXT});
+  describe('#dumpFiles', {only: false, skip: false}, () => {
+    afterEach(async () => {
+      if (client) {
+        await client.close();
+      }
+
+      await mongoFixtures.close();
+    });
+
+    it('Should dump files from the database', {only: false, skip: false}, async () => {
+      const data = getFixture({components: ['dumpFiles', '0', 'data.txt'], reader: READERS.TEXT});
       const inputFiles = {
         foobar: data
       };
@@ -180,11 +221,11 @@ describe('index', () => {
       await writeFiles(inputFiles);
       const files = await mongoFixtures.dumpFiles(true);
 
-      expect(files).to.eql(inputFiles);
+      assert.deepStrictEqual(files, inputFiles);
     });
 
-    it('Should dump files from the database using file paths', async (index = '1') => {
-      const expectedData = getFixture({components: ['dumpFiles', index, 'data.txt'], reader: READERS.TEXT});
+    it('Should dump files from the database using file paths', {only: false, skip: false}, async () => {
+      const expectedData = getFixture({components: ['dumpFiles', '1', 'data.txt'], reader: READERS.TEXT});
       const inputFiles = {
         foobar: expectedData
       };
@@ -195,25 +236,34 @@ describe('index', () => {
       await writeFiles(inputFiles);
 
       const files = await mongoFixtures.dumpFiles();
-      expect(files).to.have.all.keys('foobar');
+      assert.equal(Object.hasOwn(files, 'foobar'), true);
+
 
       const data = await readStream(files.foobar);
-      expect(data).to.eql(expectedData);
+      assert.deepStrictEqual(data, expectedData);
     });
 
-    it('Should return empty object if no files are', async () => {
+    it('Should return empty object if no files are', {only: false, skip: false}, async () => {
       mongoFixtures = await factory({rootPath: FIXTURES_PATH, gridFS: true});
 
       await connectClient();
 
       const files = await mongoFixtures.dumpFiles();
-      expect(files).to.eql({});
+      assert.deepStrictEqual(files, {});
     });
   });
 
-  describe('#clearFiles', () => {
-    it('Should clear the files', async (index = '0') => {
-      const data = getFixture({components: ['clearFiles', index, 'data.txt'], reader: READERS.TEXT});
+  describe('#clearFiles', {only: false, skip: false}, () => {
+    afterEach(async () => {
+      if (client) {
+        await client.close();
+      }
+
+      await mongoFixtures.close();
+    });
+
+    it('Should clear the files', {only: false, skip: false}, async () => {
+      const data = getFixture({components: ['clearFiles', '0', 'data.txt'], reader: READERS.TEXT});
       const files = {
         foobar: data
       };
@@ -225,7 +275,7 @@ describe('index', () => {
       await mongoFixtures.clearFiles();
 
       const collections = await client.db().collections();
-      expect(collections).to.have.lengthOf(0);
+      assert.equal(collections.length, 0);
     });
   });
 
@@ -314,7 +364,7 @@ describe('index', () => {
       stream
         .setEncoding('utf8')
         .on('error', reject)
-        .on('data', chunk => chunks.push(chunk)) // eslint-disable-line functional/immutable-data
+        .on('data', chunk => chunks.push(chunk))
         .on('end', () => resolve(chunks.join('')));
     });
   }
