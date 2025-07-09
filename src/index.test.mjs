@@ -4,14 +4,14 @@ import {describe, it, afterEach} from 'node:test';
 import assert from 'node:assert';
 import fixturesFactory, {READERS} from '@natlibfi/fixura';
 
-describe('index', {only: false, skip: false}, async () => {
+describe('index', async () => {
   let client;
   let mongoFixtures;
 
   const FIXTURES_PATH = [import.meta.dirname, '..', 'test-fixtures'];
   const {getFixture} = fixturesFactory({root: FIXTURES_PATH, reader: READERS.JSON});
 
-  describe('#getConnectionString', {only: false, skip: false}, async () => {
+  describe('#getConnectionString', async () => {
     afterEach(async () => {
       if (client) {
         await client.close();
@@ -20,14 +20,14 @@ describe('index', {only: false, skip: false}, async () => {
       await mongoFixtures.close();
     });
 
-    it('Should return a valid connection string', {only: false, skip: false}, async () => {
+    it('Should return a valid connection string', async () => {
       mongoFixtures = await factory();
       await connectClient();
       assert.match(client.s.url, (/^mongodb:\/\//u));
     });
   });
 
-  describe('#populate', {only: false, skip: false}, () => {
+  describe('#populate', async () => {
     afterEach(async () => {
       if (client) {
         await client.close();
@@ -36,7 +36,7 @@ describe('index', {only: false, skip: false}, async () => {
       await mongoFixtures.close();
     });
 
-    it('Should populate the db', {only: false, skip: false}, async () => {
+    it('Should populate the db', async () => {
       const db = getFixture({components: ['populate', '0', 'db.json']});
       mongoFixtures = await factory();
 
@@ -51,7 +51,7 @@ describe('index', {only: false, skip: false}, async () => {
       assert.deepStrictEqual(docs, db.fubar);
     });
 
-    it('Should populate the db using file path as input', {only: false, skip: false}, async () => {
+    it('Should populate the db using file path as input', async () => {
       const db = getFixture({components: ['populate', '1', 'db.json']});
       mongoFixtures = await factory({rootPath: FIXTURES_PATH});
 
@@ -67,7 +67,7 @@ describe('index', {only: false, skip: false}, async () => {
       assert.deepStrictEqual(docs, db.fubar);
     });
 
-    it('Should populate the db and convert "_id"-properties to ObjectId objects', {only: false, skip: false}, async () => {
+    it('Should populate the db and convert "_id"-properties to ObjectId objects', async () => {
       const db = getFixture({components: ['populate', '2', 'db.json']});
       mongoFixtures = await factory({rootPath: FIXTURES_PATH, useObjectId: true});
 
@@ -83,7 +83,7 @@ describe('index', {only: false, skip: false}, async () => {
       assert.deepStrictEqual(docs, db.fubar);
     });
 
-    it('Should populate the db and format values', {only: false, skip: false}, async () => {
+    it('Should populate the db and format values', async () => {
       const db = getFixture({components: ['populate', '3', 'db.json']});
 
       mongoFixtures = await factory({
@@ -108,7 +108,7 @@ describe('index', {only: false, skip: false}, async () => {
     });
   });
 
-  describe('#dump', {only: false, skip: false}, () => {
+  describe('#dump', async () => {
     afterEach(async () => {
       if (client) {
         await client.close();
@@ -117,7 +117,7 @@ describe('index', {only: false, skip: false}, async () => {
       await mongoFixtures.close();
     });
 
-    it('Should dump the database', {only: false, skip: false}, async () => {
+    it('Should dump the database', async () => {
       const db = getFixture({components: ['dump', '0', 'db.json']});
       mongoFixtures = await factory();
 
@@ -129,7 +129,7 @@ describe('index', {only: false, skip: false}, async () => {
     });
   });
 
-  describe('#clear', {only: false, skip: false}, () => {
+  describe('#clear', async () => {
     afterEach(async () => {
       if (client) {
         await client.close();
@@ -151,7 +151,7 @@ describe('index', {only: false, skip: false}, async () => {
     });
   });
 
-  describe('#populateFiles', {only: false, skip: false}, async () => {
+  describe('#populateFiles', async () => {
     afterEach(async () => {
       if (client) {
         await client.close();
@@ -160,7 +160,7 @@ describe('index', {only: false, skip: false}, async () => {
     });
 
 
-    it('Should populate the database with files', {only: false, skip: false}, async () => {
+    it('Should populate the database with files', async () => {
       const expectedDb = getFixture({components: ['populateFiles', '0', 'expectedDb.json']});
       const data = getFixture({components: ['populateFiles', '0', 'data.txt'], reader: READERS.TEXT});
       const inputFiles = {
@@ -179,7 +179,7 @@ describe('index', {only: false, skip: false}, async () => {
       assert.deepStrictEqual(await getFiles(db), [data]);
     });
 
-    it('Should populate the database with files using file paths', {only: false, skip: false}, async () => {
+    it('Should populate the database with files using file paths', async () => {
       const expectedDb = getFixture({components: ['populateFiles', '1', 'expectedDb.json']});
       const data = getFixture({components: ['populateFiles', '1', 'data.txt'], reader: READERS.TEXT});
       const inputFiles = {
@@ -200,7 +200,7 @@ describe('index', {only: false, skip: false}, async () => {
     });
   });
 
-  describe('#dumpFiles', {only: false, skip: false}, () => {
+  describe('#dumpFiles', async () => {
     afterEach(async () => {
       if (client) {
         await client.close();
@@ -209,7 +209,7 @@ describe('index', {only: false, skip: false}, async () => {
       await mongoFixtures.close();
     });
 
-    it('Should dump files from the database', {only: false, skip: false}, async () => {
+    it('Should dump files from the database', async () => {
       const data = getFixture({components: ['dumpFiles', '0', 'data.txt'], reader: READERS.TEXT});
       const inputFiles = {
         foobar: data
@@ -224,7 +224,7 @@ describe('index', {only: false, skip: false}, async () => {
       assert.deepStrictEqual(files, inputFiles);
     });
 
-    it('Should dump files from the database using file paths', {only: false, skip: false}, async () => {
+    it('Should dump files from the database using file paths', async () => {
       const expectedData = getFixture({components: ['dumpFiles', '1', 'data.txt'], reader: READERS.TEXT});
       const inputFiles = {
         foobar: expectedData
@@ -243,7 +243,7 @@ describe('index', {only: false, skip: false}, async () => {
       assert.deepStrictEqual(data, expectedData);
     });
 
-    it('Should return empty object if no files are', {only: false, skip: false}, async () => {
+    it('Should return empty object if no files are', async () => {
       mongoFixtures = await factory({rootPath: FIXTURES_PATH, gridFS: true});
 
       await connectClient();
@@ -253,7 +253,7 @@ describe('index', {only: false, skip: false}, async () => {
     });
   });
 
-  describe('#clearFiles', {only: false, skip: false}, () => {
+  describe('#clearFiles', async () => {
     afterEach(async () => {
       if (client) {
         await client.close();
@@ -262,7 +262,7 @@ describe('index', {only: false, skip: false}, async () => {
       await mongoFixtures.close();
     });
 
-    it('Should clear the files', {only: false, skip: false}, async () => {
+    it('Should clear the files', async () => {
       const data = getFixture({components: ['clearFiles', '0', 'data.txt'], reader: READERS.TEXT});
       const files = {
         foobar: data
