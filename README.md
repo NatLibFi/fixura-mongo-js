@@ -91,7 +91,7 @@ await mongoFixtures.populate(['dbContents.json']);
 
 ```
 
-## Example with fixugen
+## Example with fixugen NODE 22+
 ```js
 import assert from 'node:assert';
 import {READERS} from '@natlibfi/fixura';
