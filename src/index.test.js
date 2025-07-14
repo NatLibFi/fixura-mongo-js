@@ -1,5 +1,5 @@
 import {MongoClient, GridFSBucket} from 'mongodb';
-import factory from './index.mjs';
+import factory from './index.js';
 import {describe, it, afterEach} from 'node:test';
 import assert from 'node:assert';
 import fixturesFactory, {READERS} from '@natlibfi/fixura';
