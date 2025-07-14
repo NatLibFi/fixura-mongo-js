@@ -22,11 +22,7 @@
   "license": "MIT",
   "version": "3.0.0-alpha.4",
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "exports": {
-    "import": "./dist/index.mjs",
-    "require": "./dist/index.js"
-  },
+  "type": "module",
   "engines": {
     "node": ">=22"
   },
@@ -35,19 +31,17 @@
   },
   "scripts": {
     "prepare": "npm run build",
-    "build": "npm run build:cjs && npm run build:mjs",
-    "build:cjs": "esbuild src/**/*.mjs --sourcemap --platform=node --main-fields=main --outdir=dist --allow-overwrite --analyze",
-    "build:mjs": "esbuild src/**/*.mjs --sourcemap --platform=node --main-fields=module --outdir=dist --allow-overwrite --out-extension:.js=.mjs --format=esm",
+    "build": "esbuild src/**/*.js --sourcemap --platform=node --main-fields=main --outdir=dist --allow-overwrite --analyze",
     "lint": "eslint ./src",
     "lint:dev": "eslint --fix ./src",
-    "test:base": "node --test --test-force-exit --experimental-test-coverage --test-reporter=spec './src/*.test.mjs' './src/**/*.test.mjs'",
+    "test:base": "node --test --test-force-exit --experimental-test-coverage --test-reporter=spec './src/*.test.js' './src/**/*.test.js'",
     "test": "npm run lint && npm run test:base",
-    "watch:test": "cross-env DEBUG=@natlibfi/* NODE_ENV=test node --watch --test --experimental-test-coverage --test-reporter=spec './src/*.test.mjs' './src/**/*.test.mjs'",
+    "watch:test": "cross-env DEBUG=@natlibfi/* NODE_ENV=test node --watch --test --experimental-test-coverage --test-reporter=spec './src/*.test.js' './src/**/*.test.js'",
     "dev": "npm run watch:test",
     "dev:debug": "cross-env LOG_LEVEL=debug DEBUG=@natlibfi/* NODE_ENV=test npm run watch:test"
   },
   "dependencies": {
-    "@natlibfi/fixura": "^4.0.0-alpha.9",
+    "@natlibfi/fixura": "^4.0.0-alpha.12",
     "mongodb": "^6.17.0",
     "mongodb-memory-server": "^10.1.4"
   },
