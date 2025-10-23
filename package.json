@@ -11,13 +11,12 @@
     "mongo",
     "gridfs"
   ],
-  "homepage": "https://github.com/natlibfi/fixura-mongo-js",
+  "homepage": "https://www.npmjs.com/package/@natlibfi/fixura-mongo",
   "bugs": {
     "url": "https://github.com/natlibfi/fixura-mongo-js/issues"
   },
   "repository": {
-    "type": "git",
-    "url": "git@github.com:natlibfi/fixura-mongo-js.git"
+    "url": "https://github.com/NatLibFi/fixura-mongo-js"
   },
   "license": "MIT",
   "version": "3.0.0-alpha.5",
