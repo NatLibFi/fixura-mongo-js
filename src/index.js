@@ -101,11 +101,10 @@ export default async function ({rootPath, gridFS = false, useObjectId = false, f
   }
 
   async function getMongoMethods() {
-    /* istanbul ignore next: This won't be tested */
-    if ('MONGO_TEST_URI' in process.env) { // eslint-disable-line no-process-env
+    if ('MONGO_TEST_URI' in process.env) {
       return {
-        getUri: () => process.env.MONGO_TEST_URI, // eslint-disable-line no-process-env
-        closeCallback: () => { } // eslint-disable-line no-empty-function
+        getUri: () => process.env.MONGO_TEST_URI,
+        closeCallback: () => { }
       };
     }
 

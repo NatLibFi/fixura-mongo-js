@@ -313,7 +313,7 @@ describe('index', async () => {
       const result = await collection.find({}).toArray();
       return result.map(object => formatObj(object));
 
-      function formatObj(o) { // eslint-disable-line
+      function formatObj(o) {
         const FILTER_KEYS = [
           '_id',
           'chunkSize',
