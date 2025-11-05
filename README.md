@@ -78,10 +78,10 @@ Using the `format` parameter:
 import mongoFixturesFactory from '@natlibfi/fixura-mongo';
 
 const mongoFixtures = await fixturesFactory({
-    rootPath: [__dirname, '...', 'test-fixtures'],
+  rootPath: [__dirname, '...', 'test-fixtures'],
     format: {
-        foo: {
-            bar: v => new Date(v)
+      foo: {
+        bar: v => new Date(v)
         }
     }
 });
@@ -91,8 +91,13 @@ await mongoFixtures.populate(['dbContents.json']);
 
 ```
 
-## Example with fixugen
+## Example with fixugen NODE 22+
 ```js
+import assert from 'node:assert';
+import {READERS} from '@natlibfi/fixura';
+import mongoFixturesFactory from '@natlibfi/fixura-mongo';
+import {Error as ApiError} from '@natlibfi/melinda-commons';
+import generateTests from '@natlibfi/fixugen';
 
 describe('Stuff/to/be/tested', () => {
   let mongoFixtures; // eslint-disable-line functional/no-let
@@ -106,7 +111,7 @@ describe('Stuff/to/be/tested', () => {
       failWhenNotFound: true,
       reader: READERS.JSON
     },
-    mocha: {
+    hooks: {
       before: async () => {
         mongoFixtures = await mongoFixturesFactory({
           rootPath: [__dirname, '..', '..', 'test-fixtures', 'path', 'to', 'tests'],
@@ -151,15 +156,15 @@ describe('Stuff/to/be/tested', () => {
 
       const db = await mongoFixtures.dump();
 
-      expect(db).to.eql(expectedDb);
-      expect(expectToFail, 'This is expected to succes').to.equal(false);
+      assert.deepStrictEqual(db, expectedDb);
+      assert.equal(expectToFail, false, 'This is expected to succes');
     } catch (error) {
       if (!expectToFail) {
         throw error;
       }
-      expect(expectToFail, 'This is expected to fail').to.equal(true);
-      expect(error).to.be.an.instanceOf(ApiError);
-      expect(error.status).to.equal(expectedFailStatus);
+      assert.equal(expectToFail, true, 'This is expected to fail');
+      assert(error instanceof ApiError);
+      assert.equal(error.status, expectedFailStatus);
     }
   }
 });
