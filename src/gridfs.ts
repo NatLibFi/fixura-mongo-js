@@ -1,7 +1,16 @@
 import {GridFSBucket, MongoError} from 'mongodb';
 import fixturesFactory, {READERS} from '@natlibfi/fixura';
+import {ReadStream} from 'node:fs';
 
-export default function ({client, rootPath, bucketName = 'fs'} = {}) {
+export default function ({client, rootPath, bucketName = 'fs'}) {
+  if (client === undefined) {
+    throw new Error('GridFSBucket is missing mongo client!');
+  }
+
+  if (rootPath === undefined) {
+    throw new Error('GridFSBucket is missing root path for fixtures!');
+  }
+
   const gridFSBucket = new GridFSBucket(client.db(), {bucketName});
   const {getFixture} = fixturesFactory({root: rootPath, reader: READERS.STREAM});
 
@@ -10,9 +19,10 @@ export default function ({client, rootPath, bucketName = 'fs'} = {}) {
   async function clearFiles() {
     try {
       await gridFSBucket.drop();
-    } catch (err) {
-      if (!(err instanceof MongoError && err.codeName === 'NamespaceNotFound')) {
-        throw err;
+    } catch (error: Error | any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+      // https://www.mongodb.com/docs/manual/reference/error-codes/
+      if (!(error instanceof MongoError && error.code === 26)) {
+        throw error;
       }
     }
   }
@@ -37,21 +47,23 @@ export default function ({client, rootPath, bucketName = 'fs'} = {}) {
       return new Promise((resolve, reject) => {
         const components = data[filename];
         const inputStream = getFixture({components});
-        const outputStream = gridFSBucket.openUploadStream(filename);
+        if (inputStream && inputStream instanceof ReadStream) {
+          const outputStream = gridFSBucket.openUploadStream(filename);
 
-        outputStream
-          .on('error', reject);
+          outputStream
+            .on('error', reject);
 
-        inputStream
-          .on('error', reject)
-          .on('data', chunk => outputStream.write(chunk))
-          .on('end', () => {
-            inputStream.close();
+          inputStream
+            .on('error', reject)
+            .on('data', chunk => outputStream.write(chunk))
+            .on('end', () => {
+              inputStream.close();
 
-            outputStream
-              .on('finish', resolve)
-              .end();
-          });
+              outputStream
+                .on('finish', resolve)
+                .end();
+            });
+        }
       });
     }));
   }
@@ -75,12 +87,12 @@ export default function ({client, rootPath, bucketName = 'fs'} = {}) {
 
       function readFromFile() {
         return new Promise((resolve, reject) => {
-          const chunks = [];
+          const chunks: string[] = [];
 
           gridFSBucket.openDownloadStream(_id)
             .setEncoding('utf8')
             .on('error', reject)
-            .on('data', chunk => chunks.push(chunk))
+            .on('data', (chunk: string) => chunks.push(chunk))
             .on('end', () => resolve(chunks.join('')));
         });
       }

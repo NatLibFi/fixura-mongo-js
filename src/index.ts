@@ -1,9 +1,12 @@
 import {MongoMemoryServer} from 'mongodb-memory-server';
 import {MongoClient, ObjectId} from 'mongodb';
 import fixturesFactory, {READERS} from '@natlibfi/fixura';
-import gridFSFactory from './gridfs.js';
+import gridFSFactory from './gridfs.ts';
 
-export default async function ({rootPath, gridFS = false, useObjectId = false, format} = {}) {
+export default async function ({rootPath, gridFS, useObjectId, format}:
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  {rootPath: string[], gridFS?: any, useObjectId?: boolean, format?: any}
+) {
   const {getFixture} = fixturesFactory({root: rootPath, reader: READERS.JSON});
   const {getUri, closeCallback} = await getMongoMethods();
 
@@ -18,6 +21,7 @@ export default async function ({rootPath, gridFS = false, useObjectId = false, f
     return {populate, dump, clear, close, getUri, populateFiles, dumpFiles, clearFiles};
   }
 
+  // MARK: close
   const close = async () => {
     await clear();
     await closeCallback();
@@ -25,12 +29,14 @@ export default async function ({rootPath, gridFS = false, useObjectId = false, f
 
   return {populate, dump, clear, close, getUri};
 
+  // MARK: clear
   async function clear() {
     const client = await getClient();
     await client.db().dropDatabase();
     return client.close();
   }
 
+  // MARK: populate
   async function populate(input) {
     const data = Array.isArray(input) ? clone(getFixture({components: input})) : clone(input);
     const client = await getClient();
@@ -79,6 +85,7 @@ export default async function ({rootPath, gridFS = false, useObjectId = false, f
     return client.close();
   }
 
+  // MARK: dump
   async function dump() {
     const client = await getClient();
     const collections = await client.db().collections();
@@ -92,18 +99,27 @@ export default async function ({rootPath, gridFS = false, useObjectId = false, f
     return data.reduce((acc, collection) => ({...acc, ...collection}), {});
   }
 
+  // MARK: getClient
   async function getClient() {
-    return MongoClient.connect(await getUri(), {});
+    const mongoUri = await getUri();
+    if (mongoUri && typeof mongoUri === 'string') {
+      return MongoClient.connect(mongoUri, {});
+    }
+
+    throw new Error('Mongo connection uri missing');
   }
 
+  // MARK: clone
   function clone(o) {
     return JSON.parse(JSON.stringify(o));
   }
 
+  // MARK: getMongoMethods
   async function getMongoMethods() {
     if ('MONGO_TEST_URI' in process.env) {
       return {
-        getUri: () => process.env.MONGO_TEST_URI,
+        getUri: () => process.env['MONGO_TEST_URI'],
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         closeCallback: () => { }
       };
     }

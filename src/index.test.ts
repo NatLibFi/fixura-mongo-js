@@ -1,8 +1,8 @@
 import {MongoClient, GridFSBucket} from 'mongodb';
-import factory from './index.js';
 import {describe, it, afterEach} from 'node:test';
 import assert from 'node:assert';
 import fixturesFactory, {READERS} from '@natlibfi/fixura';
+import factory from './index.ts';
 
 describe('index', async () => {
   let client;
@@ -21,7 +21,7 @@ describe('index', async () => {
     });
 
     it('Should return a valid connection string', async () => {
-      mongoFixtures = await factory();
+      mongoFixtures = await factory({rootPath: FIXTURES_PATH});
       await connectClient();
       assert.match(client.s.url, (/^mongodb:\/\//u));
     });
@@ -38,7 +38,7 @@ describe('index', async () => {
 
     it('Should populate the db', async () => {
       const db = getFixture({components: ['populate', '0', 'db.json']});
-      mongoFixtures = await factory();
+      mongoFixtures = await factory({rootPath: FIXTURES_PATH});
 
       await connectClient();
       await mongoFixtures.populate(db);
@@ -48,6 +48,7 @@ describe('index', async () => {
       assert.equal(collections[0].collectionName, 'fubar');
 
       const docs = await getDocuments(collections[0]);
+      // @ts-expect-error db form json textfixture file
       assert.deepStrictEqual(docs, db.fubar);
     });
 
@@ -63,7 +64,8 @@ describe('index', async () => {
       assert.equal(collections.length, 1);
       assert.equal(collections[0].collectionName, 'fubar');
 
-      const docs = await getDocuments(collections[0], {includeId: true});
+      const docs = await getDocuments(collections[0]);
+      // @ts-expect-error db form json textfixture file
       assert.deepStrictEqual(docs, db.fubar);
     });
 
@@ -80,6 +82,7 @@ describe('index', async () => {
       assert.equal(collections[0].collectionName, 'fubar');
 
       const docs = await getDocuments(collections[0]);
+      // @ts-expect-error db form json textfixture file
       assert.deepStrictEqual(docs, db.fubar);
     });
 
@@ -93,6 +96,7 @@ describe('index', async () => {
       });
 
       // Expectation
+      // @ts-expect-error db form json textfixture file
       db.fubar[0].foo = 'foo';
 
       await connectClient();
@@ -104,6 +108,7 @@ describe('index', async () => {
       assert.equal(collections[0].collectionName, 'fubar');
 
       const docs = await getDocuments(collections[0]);
+      // @ts-expect-error db form json textfixture file
       assert.deepStrictEqual(docs, db.fubar);
     });
   });
@@ -119,7 +124,7 @@ describe('index', async () => {
 
     it('Should dump the database', async () => {
       const db = getFixture({components: ['dump', '0', 'db.json']});
-      mongoFixtures = await factory();
+      mongoFixtures = await factory({rootPath: FIXTURES_PATH});
 
       await connectClient();
       await populate(db);
@@ -140,7 +145,7 @@ describe('index', async () => {
 
     it('Should clear the database', async () => {
       const db = getFixture({components: ['clear', '0', 'db.json']});
-      mongoFixtures = await factory();
+      mongoFixtures = await factory({rootPath: FIXTURES_PATH});
 
       await connectClient();
       await populate(db);
@@ -359,7 +364,7 @@ describe('index', async () => {
 
   function readStream(stream) {
     return new Promise((resolve, reject) => {
-      const chunks = [];
+      const chunks: string[] = [];
 
       stream
         .setEncoding('utf8')
