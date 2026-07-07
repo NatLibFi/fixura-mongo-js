@@ -40,16 +40,19 @@
     "dev:debug": "cross-env LOG_LEVEL=debug DEBUG=@natlibfi/* NODE_ENV=test npm run watch:test"
   },
   "dependencies": {
-    "@natlibfi/fixura": "^5.0.0-alpha.4",
-    "mongodb": "^7.1.1",
-    "mongodb-memory-server": "^11.0.1"
+    "@natlibfi/fixura": "^5.0.0-alpha.8",
+    "mongodb": "^7.4.0",
+    "mongodb-memory-server": "^11.2.0"
   },
   "devDependencies": {
-    "@types/node": "^25.6.0",
+    "@types/node": "^26.1.0",
     "cross-env": "^10.1.0",
-    "eslint": "^10.2.0",
-    "jiti": "^2.6.1",
-    "typescript": "^6.0.2",
-    "typescript-eslint": "^8.58.1"
+    "eslint": "^10.6.0",
+    "jiti": "^2.7.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.63.0"
+  },
+  "allowScripts": {
+    "mongodb-memory-server@11.2.0": true
   }
 }
