@@ -15,14 +15,7 @@ Test fixtures with MongoDB is as easy as ABC with Fixura.
 ## ES modules
 ```js
 import mongoFixturesFactory from '@natlibfi/fixura-mongo';
-const mongoFixtures = await fixturesFactory({rootPath: [__dirname, '...', 'test-fixtures']});
-await mongoFixtures.populate(['dbContents.json']);
-await mongoFixtures.dump();
-```
-## Node.js require
-```js
-import {default: mongoFixturesFactory} from '@natlibfi/fixura-mongo';
-const mongoFixtures = await fixturesFactory({rootPath: [__dirname, '...', 'test-fixtures']});
+const mongoFixtures = await mongoFixturesFactory({rootPath: [__dirname, '...', 'test-fixtures']});
 await mongoFixtures.populate(['dbContents.json']);
 await mongoFixtures.dump();
 ```
@@ -37,9 +30,9 @@ await mongoFixtures.dump();
 By default, fixura-mongo uses [mongodb-memory-server](https://www.npmjs.com/package/mongodb-memory-server). For using an externally started Mongo, set environment variable `MONGO_TEST_URI`.
 # Usage
 ## Functions
-All functions are asynchronous.
+All functions except `getUri()` are asynchronous.
 ### populate
-Populate the database with test data. Accepts the data as a string or an array which defines the path to the fixture file (See [fixura]https://www.npmjs.com/package/@natlibfi/fixura).
+Populate the database with test data, clearing the database first. Accepts either an array of path components pointing to a fixture file, or the fixture data object inline (See [fixura](https://www.npmjs.com/package/@natlibfi/fixura)).
 
 The format of the fixture is as follows:
 ```js
@@ -54,6 +47,7 @@ Dumps the database in the same format as the fixture.
 Clears the database.
 ### close
 Clears and stops the database (Stopping is only applicable to mongodb-memory-server),
+When `gridFS` is enabled, `close()` also calls `clearFiles()`.
 ### getUri
 Returns the URI of the server. Used for connecting clients to the database.
 ### populateFiles (GridFS)
@@ -74,17 +68,18 @@ The path is then resolved using the root directory defined in the factory functi
 Dumps the files from the database. The format is an object with filenames as properties and their values are Readable streams. Passing `true` as the sole function arguments returns file contents as property values. Like so:
 ```js
 const data = await mongoFixtures.dumpFiles(true);
-typeof data === 'string'
+typeof data['foo'] === 'string'
 // true
 ```
 Note that the returned object contains only the entry of the first file when the bucket holds multiple files.
 ### clearFiles (GridFS)
+Removes all files from the database
 ## Examples
 Using the `format` parameter:
 ```js
 import mongoFixturesFactory from '@natlibfi/fixura-mongo';
 
-const mongoFixtures = await fixturesFactory({
+const mongoFixtures = await mongoFixturesFactory({
   rootPath: [__dirname, '...', 'test-fixtures'],
     format: {
       foo: {
@@ -177,7 +172,6 @@ describe('Stuff/to/be/tested', () => {
 });
 ```
 
-Removes all files from the database
 ## License and copyright
 
 Copyright (c) 2019-2022, 2024-2026 **University Of Helsinki (The National Library Of Finland)**
