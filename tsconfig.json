@@ -4,7 +4,8 @@
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "**/*.test.ts"
   ],
   "compilerOptions": {
     // File Layout
@@ -44,7 +45,6 @@
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
     "noEmit": false,
-    "noImplicitAny": false,
     // Customized options
     "allowJs": true,
     "checkJs": true,

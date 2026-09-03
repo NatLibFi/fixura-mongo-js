@@ -30,7 +30,7 @@
   },
   "scripts": {
     "prepare": "npm run build",
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
     "lint": "eslint ./src",
     "lint:dev": "eslint --fix ./src",
     "test:base": "node --test --test-force-exit --experimental-test-coverage --test-reporter=spec './src/index.test.ts'",

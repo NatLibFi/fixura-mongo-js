@@ -21,6 +21,9 @@ export default defineConfig(
         reportUnusedDisableDirectives: true
       },
       rules: {
+        "@typescript-eslint/no-explicit-any": [
+          "error"
+        ],
         "array-callback-return": [
           "error",
           {
@@ -40,12 +43,13 @@ export default defineConfig(
             "allowForLoopAfterthoughts": true
           }
         ],
-        "no-unused-vars": [
+        "@typescript-eslint/no-unused-vars": [
           "error",
           {
             "argsIgnorePattern": "next"
           }
         ],
+        "no-unused-vars": "off",
         "no-var": "error",
         "no-warning-comments": "off",
         "prefer-destructuring": ["error", {

@@ -1,8 +1,13 @@
 import {GridFSBucket, MongoError} from 'mongodb';
+import type {GridFSBucketReadStream, GridFSFile, MongoClient} from 'mongodb';
 import fixturesFactory, {READERS} from '@natlibfi/fixura';
 import {ReadStream} from 'node:fs';
 
-export default function ({client, rootPath, bucketName = 'fs'}) {
+export default function ({client, rootPath, bucketName = 'fs'}: {
+  client?: MongoClient;
+  rootPath?: string[];
+  bucketName?: string;
+}) {
   if (client === undefined) {
     throw new Error('GridFSBucket is missing mongo client!');
   }
@@ -19,7 +24,7 @@ export default function ({client, rootPath, bucketName = 'fs'}) {
   async function clearFiles() {
     try {
       await gridFSBucket.drop();
-    } catch (error: Error | any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+    } catch (error) {
       // https://www.mongodb.com/docs/manual/reference/error-codes/
       if (!(error instanceof MongoError && error.code === 26)) {
         throw error;
@@ -27,26 +32,25 @@ export default function ({client, rootPath, bucketName = 'fs'}) {
     }
   }
 
-  async function populateFiles(data) {
+  async function populateFiles(data: Record<string, string | string[]>) {
     await clearFiles();
 
-    return Promise.all(Object.keys(data).map(filename => {
-      if (typeof data[filename] === 'string') {
-        return new Promise((resolve, reject) => {
+    await Promise.all(Object.entries(data).map(([filename, content]) => {
+      if (typeof content === 'string') {
+        return new Promise<void>((resolve, reject) => {
           const outputStream = gridFSBucket.openUploadStream(filename);
 
           outputStream
             .on('error', reject)
             .on('finish', resolve);
 
-          outputStream.write(data[filename]);
+          outputStream.write(content);
           outputStream.end();
         });
       }
 
-      return new Promise((resolve, reject) => {
-        const components = data[filename];
-        const inputStream = getFixture({components});
+      return new Promise<void>((resolve, reject) => {
+        const inputStream = getFixture({components: content});
         if (inputStream && inputStream instanceof ReadStream) {
           const outputStream = gridFSBucket.openUploadStream(filename);
 
@@ -68,25 +72,25 @@ export default function ({client, rootPath, bucketName = 'fs'}) {
     }));
   }
 
-  async function dumpFiles(readData = false) {
+  async function dumpFiles(readData = false): Promise<Record<string, GridFSBucketReadStream | string>> {
     const result = await gridFSBucket.find({}).toArray();
     const promises = result.map(metadata => processMetadata(metadata));
     const [data] = await Promise.all(promises);
     return data ? data : {};
 
-    async function processMetadata({_id, filename}) {
+    async function processMetadata({_id, filename}: GridFSFile): Promise<Record<string, GridFSBucketReadStream | string>> {
+      const temp: Record<string, GridFSBucketReadStream | string> = {};
+
       if (readData) {
-        const temp = {};
         temp[filename] = await readFromFile();
         return temp;
       }
 
-      const temp = {};
       temp[filename] = gridFSBucket.openDownloadStream(_id);
       return temp;
 
       function readFromFile() {
-        return new Promise((resolve, reject) => {
+        return new Promise<string>((resolve, reject) => {
           const chunks: string[] = [];
 
           gridFSBucket.openDownloadStream(_id)

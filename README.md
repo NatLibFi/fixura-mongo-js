@@ -71,6 +71,7 @@ const data = await mongoFixtures.dumpFiles(true);
 typeof data === 'string'
 // true
 ```
+Note that the returned object contains only the entry of the first file when the bucket holds multiple files.
 ### clearFiles (GridFS)
 ## Examples
 Using the `format` parameter:
