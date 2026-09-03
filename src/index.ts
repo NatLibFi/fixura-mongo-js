@@ -38,7 +38,7 @@ export default async function ({rootPath, gridFS, useObjectId, format}:
 
   // MARK: populate
   async function populate(input) {
-    const data = Array.isArray(input) ? clone(getFixture({components: input})) : clone(input);
+    const data = Array.isArray(input) ? structuredClone(getFixture({components: input})) : structuredClone(input);
     const client = await getClient();
 
     await clear();
@@ -109,18 +109,13 @@ export default async function ({rootPath, gridFS, useObjectId, format}:
     throw new Error('Mongo connection uri missing');
   }
 
-  // MARK: clone
-  function clone(o) {
-    return JSON.parse(JSON.stringify(o));
-  }
-
   // MARK: getMongoMethods
   async function getMongoMethods() {
     if ('MONGO_TEST_URI' in process.env) {
       return {
         getUri: () => process.env['MONGO_TEST_URI'],
         // eslint-disable-next-line @typescript-eslint/no-empty-function
-        closeCallback: () => { }
+        closeCallback: () => {}
       };
     }
 

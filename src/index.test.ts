@@ -290,16 +290,12 @@ describe('index', async () => {
   }
 
   function populate(input) {
-    const data = clone(input);
+    const data = structuredClone(input);
 
     return Promise.all(Object.keys(data).map(async name => {
       const collection = await client.db().createCollection(name);
       await collection.insertMany(data[name]);
     }));
-
-    function clone(o) {
-      return JSON.parse(JSON.stringify(o));
-    }
   }
 
   async function getDocuments(collectionRef) {
