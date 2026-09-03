@@ -1,9 +1,15 @@
-# Test fixtures with MongoDB is as easy as ABC [![NPM Version](https://img.shields.io/npm/v/@natlibfi/fixura-mongo.svg)](https://npmjs.org/package/@natlibfi/fixura-mongo) [![Build Status](https://travis-ci.org/NatLibFi/fixura-mongo-js.svg)](https://travis-ci.org/NatLibFi/fixura-mongo-js) [![Test Coverage](https://codeclimate.com/github/NatLibFi/fixura-mongo-js/badges/coverage.svg)](https://codeclimate.com/github/NatLibFi/fixura-mongo-js/coverage)
+# Test fixtures with MongoDB is as easy as ABC [![NPM Version](https://img.shields.io/npm/v/@natlibfi/fixura-mongo.svg)](https://npmjs.org/package/@natlibfi/fixura-mongo)
 
 Test fixtures with MongoDB is as easy as ABC with Fixura.
 
 **COMPATIBLE: MONGO 4.X**
 **NOT COMPATIBLE: MONGO 3.X**
+
+## Workflow status
+| Branch | Workflow status                                                                                                                                            |
+|--------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| main   | ![Workflow status badge for branch main](https://github.com/NatLibFi/fixura-mongo-js/actions/workflows/melinda-node-tests-and-publish.yml/badge.svg?branch=main) |
+| test   | ![Workflow status badge for branch test](https://github.com/NatLibFi/fixura-mongo-js/actions/workflows/melinda-node-tests-and-publish.yml/badge.svg?branch=test) |
 
 # Usage
 ## ES modules
