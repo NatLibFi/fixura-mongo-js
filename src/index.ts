@@ -10,10 +10,11 @@ export type FormatMap = Record<string, Record<string, FormatCallback>>;
 
 export interface FixuraMongo {
   populate(input: string[] | FixtureData): Promise<void>;
-  dump(): Promise<FixtureData>;
+  // T is a caller assertion of the dumped shape, not a runtime guarantee
+  dump<T extends FixtureData = FixtureData>(): Promise<T>;
   clear(): Promise<void>;
   close(): Promise<void>;
-  getUri(): string | undefined;
+  getUri(): string;
 }
 
 export interface FixuraMongoGridFS extends FixuraMongo {
@@ -21,6 +22,20 @@ export interface FixuraMongoGridFS extends FixuraMongo {
   dumpFiles(readData?: boolean): Promise<Record<string, GridFSBucketReadStream | string>>;
   clearFiles(): Promise<void>;
 }
+
+export default function ({rootPath, gridFS, useObjectId, format}: {
+  rootPath: string[];
+  gridFS: boolean | {bucketName?: string};
+  useObjectId?: boolean;
+  format?: FormatMap;
+}): Promise<FixuraMongoGridFS>;
+
+export default function ({rootPath, gridFS, useObjectId, format}: {
+  rootPath: string[];
+  gridFS?: false;
+  useObjectId?: boolean;
+  format?: FormatMap;
+}): Promise<FixuraMongo>;
 
 export default async function ({rootPath, gridFS, useObjectId, format}: {
   rootPath: string[];
@@ -89,7 +104,7 @@ export default async function ({rootPath, gridFS, useObjectId, format}: {
   }
 
   // MARK: dump
-  async function dump(): Promise<FixtureData> {
+  async function dump<T extends FixtureData = FixtureData>(): Promise<T> {
     const client = await getClient();
     const collections = await client.db().collections();
     const data = await Promise.all(collections.map(async collection => {
@@ -99,7 +114,7 @@ export default async function ({rootPath, gridFS, useObjectId, format}: {
 
     await client.close();
 
-    return data.reduce<FixtureData>((acc, collection) => ({...acc, ...collection}), {});
+    return data.reduce<FixtureData>((acc, collection) => ({...acc, ...collection}), {}) as T;
   }
 
   // MARK: formatValues
@@ -124,7 +139,7 @@ export default async function ({rootPath, gridFS, useObjectId, format}: {
   // MARK: getClient
   async function getClient() {
     const mongoUri = await getUri();
-    if (mongoUri && typeof mongoUri === 'string') {
+    if (mongoUri) {
       return MongoClient.connect(mongoUri, {});
     }
 
@@ -135,7 +150,7 @@ export default async function ({rootPath, gridFS, useObjectId, format}: {
   async function getMongoMethods() {
     if ('MONGO_TEST_URI' in process.env) {
       return {
-        getUri: () => process.env['MONGO_TEST_URI'],
+        getUri: () => process.env['MONGO_TEST_URI'] as string,
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         closeCallback: () => {}
       };
