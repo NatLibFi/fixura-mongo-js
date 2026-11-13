@@ -40,7 +40,7 @@
     "dev:debug": "cross-env LOG_LEVEL=debug DEBUG=@natlibfi/* NODE_ENV=test npm run watch:test"
   },
   "dependencies": {
-    "@natlibfi/fixura": "^5.1.0",
+    "@natlibfi/fixura": "^5.1.1",
     "mongodb": "^7.9.0",
     "mongodb-memory-server": "^11.3.0"
   },
